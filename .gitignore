@@ -1,0 +1,13 @@
+__pycache__/
+*.py[cod]
+.pytest_cache/
+.venv/
+node_modules/
+.env
+.cfbd_key
+
+# Raw API responses are private working data, not a distributable product.
+data/raw/
+
+# Generated local review artifacts.
+*.log

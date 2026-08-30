@@ -1,0 +1,4004 @@
+{
+  "Air Force": {
+    "intercept": 1.265,
+    "drivers": [
+      {
+        "feature": "sp_overall_lag1",
+        "points": -2.666
+      },
+      {
+        "feature": "recruit_points",
+        "points": -1.931
+      },
+      {
+        "feature": "ret_recv_ppa",
+        "points": -1.841
+      },
+      {
+        "feature": "bluechip_mean4",
+        "points": -1.128
+      },
+      {
+        "feature": "sp_overall_lag3",
+        "points": 0.596
+      },
+      {
+        "feature": "sp_wavg3",
+        "points": 0.569
+      }
+    ]
+  },
+  "Akron": {
+    "intercept": 1.265,
+    "drivers": [
+      {
+        "feature": "sp_overall_lag1",
+        "points": -8.95
+      },
+      {
+        "feature": "sp_overall_lag3",
+        "points": -3.138
+      },
+      {
+        "feature": "ret_usage",
+        "points": 2.094
+      },
+      {
+        "feature": "sp_wavg3",
+        "points": 1.892
+      },
+      {
+        "feature": "ret_recv_ppa",
+        "points": 1.397
+      },
+      {
+        "feature": "bluechip_mean4",
+        "points": -1.128
+      }
+    ]
+  },
+  "Alabama": {
+    "intercept": 1.265,
+    "drivers": [
+      {
+        "feature": "sp_overall_lag1",
+        "points": 7.906
+      },
+      {
+        "feature": "recruit_points",
+        "points": 5.131
+      },
+      {
+        "feature": "bluechip_mean4",
+        "points": 4.675
+      },
+      {
+        "feature": "sp_overall_lag3",
+        "points": 2.93
+      },
+      {
+        "feature": "sp_wavg3",
+        "points": -1.872
+      },
+      {
+        "feature": "ret_usage",
+        "points": -1.696
+      }
+    ]
+  },
+  "App State": {
+    "intercept": 1.265,
+    "drivers": [
+      {
+        "feature": "sp_overall_lag1",
+        "points": -7.482
+      },
+      {
+        "feature": "recruit_points",
+        "points": 1.164
+      },
+      {
+        "feature": "bluechip_mean4",
+        "points": -1.054
+      },
+      {
+        "feature": "sp_wavg3",
+        "points": 0.927
+      },
+      {
+        "feature": "coach_change",
+        "points": 0.4
+      },
+      {
+        "feature": "ret_usage",
+        "points": -0.385
+      }
+    ]
+  },
+  "Arizona": {
+    "intercept": 1.265,
+    "drivers": [
+      {
+        "feature": "sp_overall_lag1",
+        "points": 6.261
+      },
+      {
+        "feature": "recruit_points",
+        "points": 1.846
+      },
+      {
+        "feature": "sp_overall_lag3",
+        "points": 1.709
+      },
+      {
+        "feature": "sp_wavg3",
+        "points": -0.671
+      },
+      {
+        "feature": "ret_usage",
+        "points": 0.577
+      },
+      {
+        "feature": "ret_recv_ppa",
+        "points": -0.571
+      }
+    ]
+  },
+  "Arizona State": {
+    "intercept": 1.265,
+    "drivers": [
+      {
+        "feature": "ret_usage",
+        "points": -2.676
+      },
+      {
+        "feature": "recruit_points",
+        "points": 1.869
+      },
+      {
+        "feature": "sp_overall_lag3",
+        "points": -1.739
+      },
+      {
+        "feature": "sp_overall_lag1",
+        "points": 1.504
+      },
+      {
+        "feature": "ret_recv_ppa",
+        "points": -1.114
+      },
+      {
+        "feature": "coach_change",
+        "points": 0.4
+      }
+    ]
+  },
+  "Arkansas": {
+    "intercept": 1.265,
+    "drivers": [
+      {
+        "feature": "ret_usage",
+        "points": -2.316
+      },
+      {
+        "feature": "sp_overall_lag1",
+        "points": 2.209
+      },
+      {
+        "feature": "ret_recv_ppa",
+        "points": -1.881
+      },
+      {
+        "feature": "recruit_points",
+        "points": 1.696
+      },
+      {
+        "feature": "coach_change",
+        "points": -1.583
+      },
+      {
+        "feature": "bluechip_mean4",
+        "points": 0.723
+      }
+    ]
+  },
+  "Arkansas State": {
+    "intercept": 1.265,
+    "drivers": [
+      {
+        "feature": "sp_overall_lag1",
+        "points": -5.955
+      },
+      {
+        "feature": "ret_usage",
+        "points": -1.176
+      },
+      {
+        "feature": "bluechip_mean4",
+        "points": -1.128
+      },
+      {
+        "feature": "sp_overall_lag3",
+        "points": -1.061
+      },
+      {
+        "feature": "sp_wavg3",
+        "points": 1.058
+      },
+      {
+        "feature": "recruit_points",
+        "points": 0.609
+      }
+    ]
+  },
+  "Army": {
+    "intercept": 1.265,
+    "drivers": [
+      {
+        "feature": "recruit_points",
+        "points": -4.821
+      },
+      {
+        "feature": "talent_delta",
+        "points": 2.961
+      },
+      {
+        "feature": "bluechip_mean4",
+        "points": -1.128
+      },
+      {
+        "feature": "ret_recv_ppa",
+        "points": 1.034
+      },
+      {
+        "feature": "sp_overall_lag3",
+        "points": -0.748
+      },
+      {
+        "feature": "coach_change",
+        "points": 0.4
+      }
+    ]
+  },
+  "Auburn": {
+    "intercept": 1.265,
+    "drivers": [
+      {
+        "feature": "sp_overall_lag1",
+        "points": 6.026
+      },
+      {
+        "feature": "bluechip_mean4",
+        "points": 2.94
+      },
+      {
+        "feature": "ret_usage",
+        "points": -2.316
+      },
+      {
+        "feature": "recruit_points",
+        "points": 2.198
+      },
+      {
+        "feature": "ret_recv_ppa",
+        "points": -2.0
+      },
+      {
+        "feature": "coach_change",
+        "points": -1.583
+      }
+    ]
+  },
+  "BYU": {
+    "intercept": 1.265,
+    "drivers": [
+      {
+        "feature": "sp_overall_lag1",
+        "points": 8.552
+      },
+      {
+        "feature": "recruit_points",
+        "points": 2.625
+      },
+      {
+        "feature": "ret_usage",
+        "points": 1.733
+      },
+      {
+        "feature": "sp_wavg3",
+        "points": -1.076
+      },
+      {
+        "feature": "sp_overall_lag3",
+        "points": -0.653
+      },
+      {
+        "feature": "coach_change",
+        "points": 0.4
+      }
+    ]
+  },
+  "Ball State": {
+    "intercept": 1.265,
+    "drivers": [
+      {
+        "feature": "sp_overall_lag1",
+        "points": -14.295
+      },
+      {
+        "feature": "ret_usage",
+        "points": -2.451
+      },
+      {
+        "feature": "sp_wavg3",
+        "points": 2.285
+      },
+      {
+        "feature": "sp_overall_lag3",
+        "points": -2.228
+      },
+      {
+        "feature": "bluechip_mean4",
+        "points": -1.128
+      },
+      {
+        "feature": "ret_recv_ppa",
+        "points": -1.057
+      }
+    ]
+  },
+  "Baylor": {
+    "intercept": 1.265,
+    "drivers": [
+      {
+        "feature": "sp_overall_lag3",
+        "points": -1.332
+      },
+      {
+        "feature": "recruit_points",
+        "points": 1.24
+      },
+      {
+        "feature": "ret_recv_ppa",
+        "points": -0.444
+      },
+      {
+        "feature": "coach_change",
+        "points": 0.4
+      },
+      {
+        "feature": "ret_usage",
+        "points": 0.37
+      },
+      {
+        "feature": "talent_delta",
+        "points": -0.165
+      }
+    ]
+  },
+  "Boise State": {
+    "intercept": 1.265,
+    "drivers": [
+      {
+        "feature": "recruit_points",
+        "points": 1.433
+      },
+      {
+        "feature": "sp_overall_lag1",
+        "points": 1.034
+      },
+      {
+        "feature": "bluechip_mean4",
+        "points": -0.991
+      },
+      {
+        "feature": "ret_usage",
+        "points": 0.86
+      },
+      {
+        "feature": "ret_recv_ppa",
+        "points": -0.742
+      },
+      {
+        "feature": "sp_overall_lag3",
+        "points": 0.596
+      }
+    ]
+  },
+  "Boston College": {
+    "intercept": 1.265,
+    "drivers": [
+      {
+        "feature": "sp_overall_lag1",
+        "points": -5.779
+      },
+      {
+        "feature": "ret_usage",
+        "points": -2.912
+      },
+      {
+        "feature": "ret_recv_ppa",
+        "points": -1.412
+      },
+      {
+        "feature": "recruit_points",
+        "points": 1.371
+      },
+      {
+        "feature": "bluechip_mean4",
+        "points": -1.051
+      },
+      {
+        "feature": "sp_overall_lag3",
+        "points": -1.006
+      }
+    ]
+  },
+  "Bowling Green": {
+    "intercept": 1.265,
+    "drivers": [
+      {
+        "feature": "sp_overall_lag1",
+        "points": -8.187
+      },
+      {
+        "feature": "ret_recv_ppa",
+        "points": -2.257
+      },
+      {
+        "feature": "ret_usage",
+        "points": -2.138
+      },
+      {
+        "feature": "sp_overall_lag3",
+        "points": -1.264
+      },
+      {
+        "feature": "bluechip_mean4",
+        "points": -1.128
+      },
+      {
+        "feature": "sp_wavg3",
+        "points": 1.034
+      }
+    ]
+  },
+  "Buffalo": {
+    "intercept": 1.265,
+    "drivers": [
+      {
+        "feature": "sp_overall_lag1",
+        "points": -5.191
+      },
+      {
+        "feature": "ret_recv_ppa",
+        "points": -2.649
+      },
+      {
+        "feature": "ret_usage",
+        "points": -2.611
+      },
+      {
+        "feature": "sp_overall_lag3",
+        "points": -2.269
+      },
+      {
+        "feature": "bluechip_mean4",
+        "points": -1.128
+      },
+      {
+        "feature": "sp_wavg3",
+        "points": 0.991
+      }
+    ]
+  },
+  "California": {
+    "intercept": 1.265,
+    "drivers": [
+      {
+        "feature": "sp_overall_lag1",
+        "points": -2.666
+      },
+      {
+        "feature": "coach_change",
+        "points": -1.583
+      },
+      {
+        "feature": "recruit_points",
+        "points": 1.324
+      },
+      {
+        "feature": "ret_recv_ppa",
+        "points": -0.603
+      },
+      {
+        "feature": "bluechip_mean4",
+        "points": -0.451
+      },
+      {
+        "feature": "ret_usage",
+        "points": -0.344
+      }
+    ]
+  },
+  "Central Michigan": {
+    "intercept": 1.265,
+    "drivers": [
+      {
+        "feature": "sp_overall_lag1",
+        "points": -5.955
+      },
+      {
+        "feature": "sp_overall_lag3",
+        "points": -2.798
+      },
+      {
+        "feature": "sp_wavg3",
+        "points": 1.509
+      },
+      {
+        "feature": "bluechip_mean4",
+        "points": -1.128
+      },
+      {
+        "feature": "ret_usage",
+        "points": -0.982
+      },
+      {
+        "feature": "talent_delta",
+        "points": 0.518
+      }
+    ]
+  },
+  "Charlotte": {
+    "intercept": 1.265,
+    "drivers": [
+      {
+        "feature": "sp_overall_lag1",
+        "points": -16.468
+      },
+      {
+        "feature": "sp_overall_lag3",
+        "points": -3.11
+      },
+      {
+        "feature": "sp_wavg3",
+        "points": 2.472
+      },
+      {
+        "feature": "ret_recv_ppa",
+        "points": -1.714
+      },
+      {
+        "feature": "bluechip_mean4",
+        "points": -1.128
+      },
+      {
+        "feature": "ret_usage",
+        "points": -0.651
+      }
+    ]
+  },
+  "Cincinnati": {
+    "intercept": 1.265,
+    "drivers": [
+      {
+        "feature": "ret_usage",
+        "points": -3.053
+      },
+      {
+        "feature": "sp_overall_lag1",
+        "points": 1.856
+      },
+      {
+        "feature": "ret_recv_ppa",
+        "points": -1.734
+      },
+      {
+        "feature": "recruit_points",
+        "points": 1.214
+      },
+      {
+        "feature": "sp_overall_lag3",
+        "points": -1.128
+      },
+      {
+        "feature": "bluechip_mean4",
+        "points": -0.823
+      }
+    ]
+  },
+  "Clemson": {
+    "intercept": 1.265,
+    "drivers": [
+      {
+        "feature": "sp_overall_lag1",
+        "points": 4.793
+      },
+      {
+        "feature": "bluechip_mean4",
+        "points": 2.891
+      },
+      {
+        "feature": "recruit_points",
+        "points": 2.85
+      },
+      {
+        "feature": "ret_usage",
+        "points": -1.271
+      },
+      {
+        "feature": "sp_overall_lag3",
+        "points": 1.22
+      },
+      {
+        "feature": "sp_wavg3",
+        "points": -0.968
+      }
+    ]
+  },
+  "Coastal Carolina": {
+    "intercept": 1.265,
+    "drivers": [
+      {
+        "feature": "sp_overall_lag1",
+        "points": -9.655
+      },
+      {
+        "feature": "ret_usage",
+        "points": -2.138
+      },
+      {
+        "feature": "ret_recv_ppa",
+        "points": -1.665
+      },
+      {
+        "feature": "coach_change",
+        "points": -1.583
+      },
+      {
+        "feature": "sp_wavg3",
+        "points": 1.186
+      },
+      {
+        "feature": "bluechip_mean4",
+        "points": -1.128
+      }
+    ]
+  },
+  "Colorado": {
+    "intercept": 1.265,
+    "drivers": [
+      {
+        "feature": "sp_overall_lag1",
+        "points": -5.661
+      },
+      {
+        "feature": "ret_usage",
+        "points": -1.348
+      },
+      {
+        "feature": "bluechip_mean4",
+        "points": 1.088
+      },
+      {
+        "feature": "recruit_points",
+        "points": 0.967
+      },
+      {
+        "feature": "sp_overall_lag3",
+        "points": -0.871
+      },
+      {
+        "feature": "ret_recv_ppa",
+        "points": -0.783
+      }
+    ]
+  },
+  "Colorado State": {
+    "intercept": 1.265,
+    "drivers": [
+      {
+        "feature": "sp_overall_lag1",
+        "points": -9.948
+      },
+      {
+        "feature": "ret_usage",
+        "points": -1.666
+      },
+      {
+        "feature": "coach_change",
+        "points": -1.583
+      },
+      {
+        "feature": "sp_overall_lag3",
+        "points": -1.414
+      },
+      {
+        "feature": "sp_wavg3",
+        "points": 1.335
+      },
+      {
+        "feature": "bluechip_mean4",
+        "points": -1.128
+      }
+    ]
+  },
+  "Delaware": {
+    "intercept": 1.265,
+    "drivers": [
+      {
+        "feature": "sp_overall_lag1",
+        "points": -7.188
+      },
+      {
+        "feature": "talent_delta",
+        "points": 2.525
+      },
+      {
+        "feature": "ret_usage",
+        "points": 1.94
+      },
+      {
+        "feature": "bluechip_mean4",
+        "points": -1.128
+      },
+      {
+        "feature": "ret_recv_ppa",
+        "points": 0.789
+      },
+      {
+        "feature": "coach_change",
+        "points": 0.4
+      }
+    ]
+  },
+  "Duke": {
+    "intercept": 1.265,
+    "drivers": [
+      {
+        "feature": "sp_overall_lag1",
+        "points": 3.09
+      },
+      {
+        "feature": "ret_usage",
+        "points": -2.174
+      },
+      {
+        "feature": "ret_recv_ppa",
+        "points": -1.53
+      },
+      {
+        "feature": "sp_overall_lag3",
+        "points": 1.071
+      },
+      {
+        "feature": "recruit_points",
+        "points": 0.813
+      },
+      {
+        "feature": "sp_wavg3",
+        "points": -0.554
+      }
+    ]
+  },
+  "East Carolina": {
+    "intercept": 1.265,
+    "drivers": [
+      {
+        "feature": "sp_overall_lag1",
+        "points": 3.912
+      },
+      {
+        "feature": "ret_usage",
+        "points": -2.67
+      },
+      {
+        "feature": "sp_overall_lag3",
+        "points": -1.943
+      },
+      {
+        "feature": "ret_recv_ppa",
+        "points": -1.563
+      },
+      {
+        "feature": "bluechip_mean4",
+        "points": -1.04
+      },
+      {
+        "feature": "recruit_points",
+        "points": 0.425
+      }
+    ]
+  },
+  "Eastern Michigan": {
+    "intercept": 1.265,
+    "drivers": [
+      {
+        "feature": "sp_overall_lag1",
+        "points": -9.42
+      },
+      {
+        "feature": "sp_overall_lag3",
+        "points": -1.875
+      },
+      {
+        "feature": "sp_wavg3",
+        "points": 1.596
+      },
+      {
+        "feature": "bluechip_mean4",
+        "points": -1.128
+      },
+      {
+        "feature": "coach_change",
+        "points": 0.4
+      },
+      {
+        "feature": "recruit_points",
+        "points": 0.29
+      }
+    ]
+  },
+  "Florida": {
+    "intercept": 1.265,
+    "drivers": [
+      {
+        "feature": "bluechip_mean4",
+        "points": 4.151
+      },
+      {
+        "feature": "recruit_points",
+        "points": 3.14
+      },
+      {
+        "feature": "coach_change",
+        "points": -1.583
+      },
+      {
+        "feature": "sp_overall_lag1",
+        "points": 1.269
+      },
+      {
+        "feature": "ret_usage",
+        "points": 1.19
+      },
+      {
+        "feature": "sp_overall_lag3",
+        "points": 0.718
+      }
+    ]
+  },
+  "Florida Atlantic": {
+    "intercept": 1.265,
+    "drivers": [
+      {
+        "feature": "sp_overall_lag1",
+        "points": -5.896
+      },
+      {
+        "feature": "sp_overall_lag3",
+        "points": -1.481
+      },
+      {
+        "feature": "sp_wavg3",
+        "points": 1.205
+      },
+      {
+        "feature": "bluechip_mean4",
+        "points": -1.128
+      },
+      {
+        "feature": "ret_recv_ppa",
+        "points": -0.42
+      },
+      {
+        "feature": "coach_change",
+        "points": 0.4
+      }
+    ]
+  },
+  "Florida International": {
+    "intercept": 1.265,
+    "drivers": [
+      {
+        "feature": "sp_overall_lag1",
+        "points": -6.953
+      },
+      {
+        "feature": "sp_overall_lag3",
+        "points": -3.083
+      },
+      {
+        "feature": "ret_usage",
+        "points": -1.92
+      },
+      {
+        "feature": "sp_wavg3",
+        "points": 1.525
+      },
+      {
+        "feature": "bluechip_mean4",
+        "points": -1.128
+      },
+      {
+        "feature": "coach_change",
+        "points": 0.4
+      }
+    ]
+  },
+  "Florida State": {
+    "intercept": 1.265,
+    "drivers": [
+      {
+        "feature": "sp_overall_lag1",
+        "points": 3.442
+      },
+      {
+        "feature": "recruit_points",
+        "points": 3.161
+      },
+      {
+        "feature": "bluechip_mean4",
+        "points": 2.819
+      },
+      {
+        "feature": "sp_overall_lag3",
+        "points": 2.428
+      },
+      {
+        "feature": "ret_usage",
+        "points": -1.672
+      },
+      {
+        "feature": "sp_wavg3",
+        "points": -0.519
+      }
+    ]
+  },
+  "Fresno State": {
+    "intercept": 1.265,
+    "drivers": [
+      {
+        "feature": "bluechip_mean4",
+        "points": -1.128
+      },
+      {
+        "feature": "recruit_points",
+        "points": 0.817
+      },
+      {
+        "feature": "ret_usage",
+        "points": -0.574
+      },
+      {
+        "feature": "ret_recv_ppa",
+        "points": 0.479
+      },
+      {
+        "feature": "coach_change",
+        "points": 0.4
+      },
+      {
+        "feature": "sp_overall_lag1",
+        "points": 0.271
+      }
+    ]
+  },
+  "Georgia": {
+    "intercept": 1.265,
+    "drivers": [
+      {
+        "feature": "sp_overall_lag1",
+        "points": 13.368
+      },
+      {
+        "feature": "bluechip_mean4",
+        "points": 4.746
+      },
+      {
+        "feature": "recruit_points",
+        "points": 4.686
+      },
+      {
+        "feature": "sp_overall_lag3",
+        "points": 4.03
+      },
+      {
+        "feature": "sp_wavg3",
+        "points": -2.502
+      },
+      {
+        "feature": "ret_recv_ppa",
+        "points": -0.942
+      }
+    ]
+  },
+  "Georgia Southern": {
+    "intercept": 1.265,
+    "drivers": [
+      {
+        "feature": "sp_overall_lag1",
+        "points": -6.307
+      },
+      {
+        "feature": "ret_usage",
+        "points": -2.221
+      },
+      {
+        "feature": "ret_recv_ppa",
+        "points": -1.979
+      },
+      {
+        "feature": "bluechip_mean4",
+        "points": -0.952
+      },
+      {
+        "feature": "sp_overall_lag3",
+        "points": -0.911
+      },
+      {
+        "feature": "sp_wavg3",
+        "points": 0.81
+      }
+    ]
+  },
+  "Georgia State": {
+    "intercept": 1.265,
+    "drivers": [
+      {
+        "feature": "sp_overall_lag1",
+        "points": -15.176
+      },
+      {
+        "feature": "sp_wavg3",
+        "points": 2.135
+      },
+      {
+        "feature": "ret_usage",
+        "points": -1.784
+      },
+      {
+        "feature": "ret_recv_ppa",
+        "points": -1.232
+      },
+      {
+        "feature": "sp_overall_lag3",
+        "points": -1.128
+      },
+      {
+        "feature": "bluechip_mean4",
+        "points": -1.012
+      }
+    ]
+  },
+  "Georgia Tech": {
+    "intercept": 1.265,
+    "drivers": [
+      {
+        "feature": "sp_overall_lag1",
+        "points": 4.676
+      },
+      {
+        "feature": "ret_usage",
+        "points": -2.617
+      },
+      {
+        "feature": "ret_recv_ppa",
+        "points": -1.898
+      },
+      {
+        "feature": "recruit_points",
+        "points": 1.847
+      },
+      {
+        "feature": "coach_change",
+        "points": 0.4
+      },
+      {
+        "feature": "sp_wavg3",
+        "points": -0.39
+      }
+    ]
+  },
+  "Hawai'i": {
+    "intercept": 1.265,
+    "drivers": [
+      {
+        "feature": "sp_overall_lag3",
+        "points": -2.432
+      },
+      {
+        "feature": "bluechip_mean4",
+        "points": -1.128
+      },
+      {
+        "feature": "sp_wavg3",
+        "points": 0.753
+      },
+      {
+        "feature": "talent_delta",
+        "points": 0.703
+      },
+      {
+        "feature": "coach_change",
+        "points": 0.4
+      },
+      {
+        "feature": "recruit_points",
+        "points": -0.235
+      }
+    ]
+  },
+  "Houston": {
+    "intercept": 1.265,
+    "drivers": [
+      {
+        "feature": "sp_overall_lag1",
+        "points": 3.56
+      },
+      {
+        "feature": "recruit_points",
+        "points": 1.929
+      },
+      {
+        "feature": "sp_overall_lag3",
+        "points": -1.264
+      },
+      {
+        "feature": "coach_change",
+        "points": 0.4
+      },
+      {
+        "feature": "talent_delta",
+        "points": 0.301
+      },
+      {
+        "feature": "wins_lag1",
+        "points": 0.213
+      }
+    ]
+  },
+  "Illinois": {
+    "intercept": 1.265,
+    "drivers": [
+      {
+        "feature": "sp_overall_lag1",
+        "points": 6.79
+      },
+      {
+        "feature": "recruit_points",
+        "points": 2.356
+      },
+      {
+        "feature": "ret_recv_ppa",
+        "points": -1.081
+      },
+      {
+        "feature": "ret_usage",
+        "points": -0.905
+      },
+      {
+        "feature": "sp_wavg3",
+        "points": -0.759
+      },
+      {
+        "feature": "sp_overall_lag3",
+        "points": -0.545
+      }
+    ]
+  },
+  "Indiana": {
+    "intercept": 1.265,
+    "drivers": [
+      {
+        "feature": "sp_overall_lag1",
+        "points": 18.242
+      },
+      {
+        "feature": "ret_usage",
+        "points": -2.776
+      },
+      {
+        "feature": "recruit_points",
+        "points": 2.215
+      },
+      {
+        "feature": "sp_wavg3",
+        "points": -2.0
+      },
+      {
+        "feature": "ret_recv_ppa",
+        "points": -1.375
+      },
+      {
+        "feature": "sp_overall_lag3",
+        "points": -1.21
+      }
+    ]
+  },
+  "Iowa": {
+    "intercept": 1.265,
+    "drivers": [
+      {
+        "feature": "sp_overall_lag1",
+        "points": 10.784
+      },
+      {
+        "feature": "recruit_points",
+        "points": 2.295
+      },
+      {
+        "feature": "sp_wavg3",
+        "points": -1.479
+      },
+      {
+        "feature": "ret_usage",
+        "points": -1.088
+      },
+      {
+        "feature": "bluechip_mean4",
+        "points": 0.606
+      },
+      {
+        "feature": "sp_overall_lag3",
+        "points": 0.582
+      }
+    ]
+  },
+  "Iowa State": {
+    "intercept": 1.265,
+    "drivers": [
+      {
+        "feature": "sp_overall_lag1",
+        "points": 5.028
+      },
+      {
+        "feature": "ret_usage",
+        "points": -3.301
+      },
+      {
+        "feature": "ret_recv_ppa",
+        "points": -2.367
+      },
+      {
+        "feature": "coach_change",
+        "points": -1.583
+      },
+      {
+        "feature": "recruit_points",
+        "points": 1.343
+      },
+      {
+        "feature": "bluechip_mean4",
+        "points": -0.895
+      }
+    ]
+  },
+  "Jacksonville State": {
+    "intercept": 1.265,
+    "drivers": [
+      {
+        "feature": "sp_overall_lag1",
+        "points": -4.721
+      },
+      {
+        "feature": "bluechip_mean4",
+        "points": -1.128
+      },
+      {
+        "feature": "talent_delta",
+        "points": 0.783
+      },
+      {
+        "feature": "ret_usage",
+        "points": -0.722
+      },
+      {
+        "feature": "recruit_points",
+        "points": 0.59
+      },
+      {
+        "feature": "sp_wavg3",
+        "points": 0.573
+      }
+    ]
+  },
+  "James Madison": {
+    "intercept": 1.265,
+    "drivers": [
+      {
+        "feature": "sp_overall_lag1",
+        "points": 6.437
+      },
+      {
+        "feature": "ret_usage",
+        "points": -3.006
+      },
+      {
+        "feature": "ret_recv_ppa",
+        "points": -2.008
+      },
+      {
+        "feature": "coach_change",
+        "points": -1.583
+      },
+      {
+        "feature": "sp_overall_lag3",
+        "points": 1.396
+      },
+      {
+        "feature": "talent_delta",
+        "points": 1.29
+      }
+    ]
+  },
+  "Kansas": {
+    "intercept": 1.265,
+    "drivers": [
+      {
+        "feature": "ret_usage",
+        "points": -2.516
+      },
+      {
+        "feature": "sp_overall_lag1",
+        "points": 1.622
+      },
+      {
+        "feature": "sp_overall_lag3",
+        "points": 1.139
+      },
+      {
+        "feature": "recruit_points",
+        "points": 1.103
+      },
+      {
+        "feature": "ret_recv_ppa",
+        "points": -1.008
+      },
+      {
+        "feature": "bluechip_mean4",
+        "points": -0.699
+      }
+    ]
+  },
+  "Kansas State": {
+    "intercept": 1.265,
+    "drivers": [
+      {
+        "feature": "sp_overall_lag1",
+        "points": 3.325
+      },
+      {
+        "feature": "sp_overall_lag3",
+        "points": 1.994
+      },
+      {
+        "feature": "coach_change",
+        "points": -1.583
+      },
+      {
+        "feature": "recruit_points",
+        "points": 1.513
+      },
+      {
+        "feature": "ret_usage",
+        "points": 1.22
+      },
+      {
+        "feature": "sp_wavg3",
+        "points": -0.982
+      }
+    ]
+  },
+  "Kennesaw State": {
+    "intercept": 1.265,
+    "drivers": [
+      {
+        "feature": "sp_overall_lag1",
+        "points": -3.958
+      },
+      {
+        "feature": "ret_usage",
+        "points": -3.166
+      },
+      {
+        "feature": "ret_recv_ppa",
+        "points": -1.82
+      },
+      {
+        "feature": "talent_delta",
+        "points": 1.679
+      },
+      {
+        "feature": "bluechip_mean4",
+        "points": -1.128
+      },
+      {
+        "feature": "coach_change",
+        "points": 0.4
+      }
+    ]
+  },
+  "Kent State": {
+    "intercept": 1.265,
+    "drivers": [
+      {
+        "feature": "sp_overall_lag1",
+        "points": -12.122
+      },
+      {
+        "feature": "sp_overall_lag3",
+        "points": -3.776
+      },
+      {
+        "feature": "sp_wavg3",
+        "points": 2.742
+      },
+      {
+        "feature": "bluechip_mean4",
+        "points": -1.128
+      },
+      {
+        "feature": "talent_delta",
+        "points": 0.603
+      },
+      {
+        "feature": "ret_recv_ppa",
+        "points": -0.513
+      }
+    ]
+  },
+  "Kentucky": {
+    "intercept": 1.265,
+    "drivers": [
+      {
+        "feature": "ret_usage",
+        "points": -2.41
+      },
+      {
+        "feature": "coach_change",
+        "points": -1.583
+      },
+      {
+        "feature": "sp_overall_lag3",
+        "points": 1.22
+      },
+      {
+        "feature": "recruit_points",
+        "points": 1.113
+      },
+      {
+        "feature": "bluechip_mean4",
+        "points": 1.048
+      },
+      {
+        "feature": "ret_recv_ppa",
+        "points": -0.95
+      }
+    ]
+  },
+  "LSU": {
+    "intercept": 1.265,
+    "drivers": [
+      {
+        "feature": "sp_overall_lag1",
+        "points": 5.263
+      },
+      {
+        "feature": "bluechip_mean4",
+        "points": 4.386
+      },
+      {
+        "feature": "recruit_points",
+        "points": 3.959
+      },
+      {
+        "feature": "sp_overall_lag3",
+        "points": 2.387
+      },
+      {
+        "feature": "ret_usage",
+        "points": -1.885
+      },
+      {
+        "feature": "coach_change",
+        "points": -1.583
+      }
+    ]
+  },
+  "Liberty": {
+    "intercept": 1.265,
+    "drivers": [
+      {
+        "feature": "sp_overall_lag1",
+        "points": -6.072
+      },
+      {
+        "feature": "ret_recv_ppa",
+        "points": -1.498
+      },
+      {
+        "feature": "bluechip_mean4",
+        "points": -1.128
+      },
+      {
+        "feature": "ret_usage",
+        "points": -0.964
+      },
+      {
+        "feature": "sp_overall_lag3",
+        "points": 0.881
+      },
+      {
+        "feature": "sp_wavg3",
+        "points": 0.455
+      }
+    ]
+  },
+  "Louisiana": {
+    "intercept": 1.265,
+    "drivers": [
+      {
+        "feature": "sp_overall_lag1",
+        "points": -6.718
+      },
+      {
+        "feature": "ret_recv_ppa",
+        "points": 1.414
+      },
+      {
+        "feature": "bluechip_mean4",
+        "points": -1.128
+      },
+      {
+        "feature": "sp_wavg3",
+        "points": 0.527
+      },
+      {
+        "feature": "recruit_points",
+        "points": 0.456
+      },
+      {
+        "feature": "ret_usage",
+        "points": 0.429
+      }
+    ]
+  },
+  "Louisiana Tech": {
+    "intercept": 1.265,
+    "drivers": [
+      {
+        "feature": "sp_overall_lag3",
+        "points": -1.957
+      },
+      {
+        "feature": "sp_overall_lag1",
+        "points": -1.55
+      },
+      {
+        "feature": "bluechip_mean4",
+        "points": -1.128
+      },
+      {
+        "feature": "sp_wavg3",
+        "points": 0.858
+      },
+      {
+        "feature": "ret_usage",
+        "points": -0.586
+      },
+      {
+        "feature": "ret_recv_ppa",
+        "points": -0.567
+      }
+    ]
+  },
+  "Louisville": {
+    "intercept": 1.265,
+    "drivers": [
+      {
+        "feature": "sp_overall_lag1",
+        "points": 6.496
+      },
+      {
+        "feature": "ret_usage",
+        "points": -1.891
+      },
+      {
+        "feature": "recruit_points",
+        "points": 1.657
+      },
+      {
+        "feature": "ret_recv_ppa",
+        "points": -1.616
+      },
+      {
+        "feature": "sp_wavg3",
+        "points": -1.076
+      },
+      {
+        "feature": "sp_overall_lag3",
+        "points": 0.881
+      }
+    ]
+  },
+  "Marshall": {
+    "intercept": 1.265,
+    "drivers": [
+      {
+        "feature": "sp_overall_lag1",
+        "points": -3.429
+      },
+      {
+        "feature": "sp_overall_lag3",
+        "points": -1.427
+      },
+      {
+        "feature": "ret_recv_ppa",
+        "points": 1.373
+      },
+      {
+        "feature": "bluechip_mean4",
+        "points": -1.128
+      },
+      {
+        "feature": "ret_usage",
+        "points": 0.966
+      },
+      {
+        "feature": "sp_wavg3",
+        "points": 0.485
+      }
+    ]
+  },
+  "Maryland": {
+    "intercept": 1.265,
+    "drivers": [
+      {
+        "feature": "recruit_points",
+        "points": 1.816
+      },
+      {
+        "feature": "sp_overall_lag3",
+        "points": 1.288
+      },
+      {
+        "feature": "ret_recv_ppa",
+        "points": -1.281
+      },
+      {
+        "feature": "ret_usage",
+        "points": 0.689
+      },
+      {
+        "feature": "sp_overall_lag1",
+        "points": -0.434
+      },
+      {
+        "feature": "coach_change",
+        "points": 0.4
+      }
+    ]
+  },
+  "Massachusetts": {
+    "intercept": 1.265,
+    "drivers": [
+      {
+        "feature": "sp_overall_lag1",
+        "points": -22.282
+      },
+      {
+        "feature": "sp_wavg3",
+        "points": 3.112
+      },
+      {
+        "feature": "ret_recv_ppa",
+        "points": -2.808
+      },
+      {
+        "feature": "ret_usage",
+        "points": -2.676
+      },
+      {
+        "feature": "sp_overall_lag3",
+        "points": -2.581
+      },
+      {
+        "feature": "bluechip_mean4",
+        "points": -1.128
+      }
+    ]
+  },
+  "Memphis": {
+    "intercept": 1.265,
+    "drivers": [
+      {
+        "feature": "sp_overall_lag1",
+        "points": 3.677
+      },
+      {
+        "feature": "ret_usage",
+        "points": -3.289
+      },
+      {
+        "feature": "ret_recv_ppa",
+        "points": -1.906
+      },
+      {
+        "feature": "coach_change",
+        "points": -1.583
+      },
+      {
+        "feature": "bluechip_mean4",
+        "points": -0.818
+      },
+      {
+        "feature": "recruit_points",
+        "points": 0.81
+      }
+    ]
+  },
+  "Miami": {
+    "intercept": 1.265,
+    "drivers": [
+      {
+        "feature": "sp_overall_lag1",
+        "points": 11.371
+      },
+      {
+        "feature": "recruit_points",
+        "points": 4.408
+      },
+      {
+        "feature": "bluechip_mean4",
+        "points": 3.778
+      },
+      {
+        "feature": "sp_wavg3",
+        "points": -1.791
+      },
+      {
+        "feature": "sp_overall_lag3",
+        "points": 1.098
+      },
+      {
+        "feature": "ret_usage",
+        "points": -0.574
+      }
+    ]
+  },
+  "Miami (OH)": {
+    "intercept": 1.265,
+    "drivers": [
+      {
+        "feature": "sp_overall_lag1",
+        "points": -2.783
+      },
+      {
+        "feature": "ret_recv_ppa",
+        "points": -1.828
+      },
+      {
+        "feature": "ret_usage",
+        "points": -1.778
+      },
+      {
+        "feature": "bluechip_mean4",
+        "points": -1.128
+      },
+      {
+        "feature": "coach_change",
+        "points": 0.4
+      },
+      {
+        "feature": "recruit_points",
+        "points": 0.309
+      }
+    ]
+  },
+  "Michigan": {
+    "intercept": 1.265,
+    "drivers": [
+      {
+        "feature": "sp_overall_lag1",
+        "points": 6.496
+      },
+      {
+        "feature": "sp_overall_lag3",
+        "points": 4.044
+      },
+      {
+        "feature": "recruit_points",
+        "points": 3.862
+      },
+      {
+        "feature": "bluechip_mean4",
+        "points": 3.093
+      },
+      {
+        "feature": "coach_change",
+        "points": -1.583
+      },
+      {
+        "feature": "sp_wavg3",
+        "points": -1.468
+      }
+    ]
+  },
+  "Michigan State": {
+    "intercept": 1.265,
+    "drivers": [
+      {
+        "feature": "sp_overall_lag1",
+        "points": -2.783
+      },
+      {
+        "feature": "recruit_points",
+        "points": 1.735
+      },
+      {
+        "feature": "ret_usage",
+        "points": -1.678
+      },
+      {
+        "feature": "coach_change",
+        "points": -1.583
+      },
+      {
+        "feature": "ret_recv_ppa",
+        "points": -1.363
+      },
+      {
+        "feature": "sp_overall_lag3",
+        "points": -1.128
+      }
+    ]
+  },
+  "Middle Tennessee": {
+    "intercept": 1.265,
+    "drivers": [
+      {
+        "feature": "sp_overall_lag1",
+        "points": -10.183
+      },
+      {
+        "feature": "sp_wavg3",
+        "points": 1.952
+      },
+      {
+        "feature": "ret_usage",
+        "points": -1.778
+      },
+      {
+        "feature": "sp_overall_lag3",
+        "points": -1.495
+      },
+      {
+        "feature": "ret_recv_ppa",
+        "points": -1.289
+      },
+      {
+        "feature": "bluechip_mean4",
+        "points": -1.128
+      }
+    ]
+  },
+  "Minnesota": {
+    "intercept": 1.265,
+    "drivers": [
+      {
+        "feature": "recruit_points",
+        "points": 2.223
+      },
+      {
+        "feature": "ret_usage",
+        "points": 0.535
+      },
+      {
+        "feature": "ret_recv_ppa",
+        "points": -0.518
+      },
+      {
+        "feature": "coach_change",
+        "points": 0.4
+      },
+      {
+        "feature": "sp_wavg3",
+        "points": -0.251
+      },
+      {
+        "feature": "bluechip_mean4",
+        "points": -0.154
+      }
+    ]
+  },
+  "Mississippi State": {
+    "intercept": 1.265,
+    "drivers": [
+      {
+        "feature": "recruit_points",
+        "points": 2.37
+      },
+      {
+        "feature": "sp_overall_lag1",
+        "points": 1.622
+      },
+      {
+        "feature": "ret_recv_ppa",
+        "points": -1.22
+      },
+      {
+        "feature": "ret_usage",
+        "points": -1.123
+      },
+      {
+        "feature": "bluechip_mean4",
+        "points": 0.453
+      },
+      {
+        "feature": "coach_change",
+        "points": 0.4
+      }
+    ]
+  },
+  "Missouri": {
+    "intercept": 1.265,
+    "drivers": [
+      {
+        "feature": "sp_overall_lag1",
+        "points": 7.671
+      },
+      {
+        "feature": "sp_overall_lag3",
+        "points": 2.415
+      },
+      {
+        "feature": "recruit_points",
+        "points": 2.164
+      },
+      {
+        "feature": "bluechip_mean4",
+        "points": 1.52
+      },
+      {
+        "feature": "sp_wavg3",
+        "points": -1.428
+      },
+      {
+        "feature": "ret_recv_ppa",
+        "points": -1.016
+      }
+    ]
+  },
+  "Missouri State": {
+    "intercept": 1.265,
+    "drivers": [
+      {
+        "feature": "sp_overall_lag1",
+        "points": -7.071
+      },
+      {
+        "feature": "ret_usage",
+        "points": -2.339
+      },
+      {
+        "feature": "coach_change",
+        "points": -1.583
+      },
+      {
+        "feature": "talent_delta",
+        "points": 1.235
+      },
+      {
+        "feature": "bluechip_mean4",
+        "points": -1.128
+      },
+      {
+        "feature": "recruit_points",
+        "points": -0.609
+      }
+    ]
+  },
+  "NC State": {
+    "intercept": 1.265,
+    "drivers": [
+      {
+        "feature": "sp_overall_lag1",
+        "points": 2.033
+      },
+      {
+        "feature": "recruit_points",
+        "points": 1.605
+      },
+      {
+        "feature": "ret_recv_ppa",
+        "points": -1.297
+      },
+      {
+        "feature": "sp_overall_lag3",
+        "points": 0.799
+      },
+      {
+        "feature": "talent_delta",
+        "points": 0.416
+      },
+      {
+        "feature": "coach_change",
+        "points": 0.4
+      }
+    ]
+  },
+  "Navy": {
+    "intercept": 1.265,
+    "drivers": [
+      {
+        "feature": "sp_overall_lag1",
+        "points": 2.855
+      },
+      {
+        "feature": "ret_usage",
+        "points": -2.67
+      },
+      {
+        "feature": "recruit_points",
+        "points": -2.576
+      },
+      {
+        "feature": "sp_overall_lag3",
+        "points": -2.065
+      },
+      {
+        "feature": "ret_recv_ppa",
+        "points": -1.763
+      },
+      {
+        "feature": "bluechip_mean4",
+        "points": -1.128
+      }
+    ]
+  },
+  "Nebraska": {
+    "intercept": 1.265,
+    "drivers": [
+      {
+        "feature": "sp_overall_lag1",
+        "points": 2.855
+      },
+      {
+        "feature": "ret_usage",
+        "points": -1.159
+      },
+      {
+        "feature": "bluechip_mean4",
+        "points": 1.075
+      },
+      {
+        "feature": "ret_recv_ppa",
+        "points": 0.667
+      },
+      {
+        "feature": "recruit_points",
+        "points": 0.55
+      },
+      {
+        "feature": "talent_delta",
+        "points": -0.507
+      }
+    ]
+  },
+  "Nevada": {
+    "intercept": 1.265,
+    "drivers": [
+      {
+        "feature": "sp_overall_lag1",
+        "points": -8.656
+      },
+      {
+        "feature": "sp_overall_lag3",
+        "points": -3.192
+      },
+      {
+        "feature": "sp_wavg3",
+        "points": 1.79
+      },
+      {
+        "feature": "bluechip_mean4",
+        "points": -1.128
+      },
+      {
+        "feature": "ret_usage",
+        "points": -0.852
+      },
+      {
+        "feature": "ret_recv_ppa",
+        "points": -0.677
+      }
+    ]
+  },
+  "New Mexico": {
+    "intercept": 1.265,
+    "drivers": [
+      {
+        "feature": "sp_overall_lag3",
+        "points": -2.445
+      },
+      {
+        "feature": "talent_delta",
+        "points": 1.959
+      },
+      {
+        "feature": "bluechip_mean4",
+        "points": -1.128
+      },
+      {
+        "feature": "sp_wavg3",
+        "points": 0.919
+      },
+      {
+        "feature": "ret_recv_ppa",
+        "points": -0.595
+      },
+      {
+        "feature": "recruit_points",
+        "points": 0.562
+      }
+    ]
+  },
+  "New Mexico State": {
+    "intercept": 1.265,
+    "drivers": [
+      {
+        "feature": "sp_overall_lag1",
+        "points": -9.89
+      },
+      {
+        "feature": "ret_usage",
+        "points": -1.696
+      },
+      {
+        "feature": "sp_wavg3",
+        "points": 1.597
+      },
+      {
+        "feature": "recruit_points",
+        "points": -1.458
+      },
+      {
+        "feature": "bluechip_mean4",
+        "points": -1.128
+      },
+      {
+        "feature": "ret_recv_ppa",
+        "points": -1.122
+      }
+    ]
+  },
+  "North Carolina": {
+    "intercept": 1.265,
+    "drivers": [
+      {
+        "feature": "sp_overall_lag1",
+        "points": -4.663
+      },
+      {
+        "feature": "recruit_points",
+        "points": 3.016
+      },
+      {
+        "feature": "ret_usage",
+        "points": -1.607
+      },
+      {
+        "feature": "ret_recv_ppa",
+        "points": -1.02
+      },
+      {
+        "feature": "sp_overall_lag3",
+        "points": 0.799
+      },
+      {
+        "feature": "coach_change",
+        "points": 0.4
+      }
+    ]
+  },
+  "North Dakota State": {
+    "intercept": 1.265,
+    "drivers": [
+      {
+        "feature": "bluechip_mean4",
+        "points": -1.128
+      },
+      {
+        "feature": "coach_change",
+        "points": 0.4
+      },
+      {
+        "feature": "sp_overall_lag1",
+        "points": 0.153
+      },
+      {
+        "feature": "ret_usage",
+        "points": 0.063
+      },
+      {
+        "feature": "recruit_points",
+        "points": -0.042
+      },
+      {
+        "feature": "sp_overall_lag3",
+        "points": 0.039
+      }
+    ]
+  },
+  "North Texas": {
+    "intercept": 1.265,
+    "drivers": [
+      {
+        "feature": "sp_overall_lag1",
+        "points": 7.318
+      },
+      {
+        "feature": "ret_usage",
+        "points": -3.372
+      },
+      {
+        "feature": "ret_recv_ppa",
+        "points": -2.261
+      },
+      {
+        "feature": "coach_change",
+        "points": -1.583
+      },
+      {
+        "feature": "recruit_points",
+        "points": -1.496
+      },
+      {
+        "feature": "bluechip_mean4",
+        "points": -1.128
+      }
+    ]
+  },
+  "Northern Illinois": {
+    "intercept": 1.265,
+    "drivers": [
+      {
+        "feature": "sp_overall_lag1",
+        "points": -10.595
+      },
+      {
+        "feature": "coach_change",
+        "points": -1.583
+      },
+      {
+        "feature": "ret_recv_ppa",
+        "points": 1.434
+      },
+      {
+        "feature": "sp_wavg3",
+        "points": 1.294
+      },
+      {
+        "feature": "sp_overall_lag3",
+        "points": -1.224
+      },
+      {
+        "feature": "bluechip_mean4",
+        "points": -1.128
+      }
+    ]
+  },
+  "Northwestern": {
+    "intercept": 1.265,
+    "drivers": [
+      {
+        "feature": "sp_overall_lag1",
+        "points": 2.62
+      },
+      {
+        "feature": "ret_usage",
+        "points": 2.123
+      },
+      {
+        "feature": "recruit_points",
+        "points": 1.404
+      },
+      {
+        "feature": "ret_recv_ppa",
+        "points": 1.165
+      },
+      {
+        "feature": "bluechip_mean4",
+        "points": -0.862
+      },
+      {
+        "feature": "coach_change",
+        "points": 0.4
+      }
+    ]
+  },
+  "Notre Dame": {
+    "intercept": 1.265,
+    "drivers": [
+      {
+        "feature": "sp_overall_lag1",
+        "points": 13.544
+      },
+      {
+        "feature": "recruit_points",
+        "points": 4.961
+      },
+      {
+        "feature": "bluechip_mean4",
+        "points": 4.13
+      },
+      {
+        "feature": "sp_overall_lag3",
+        "points": 2.523
+      },
+      {
+        "feature": "sp_wavg3",
+        "points": -2.274
+      },
+      {
+        "feature": "ret_recv_ppa",
+        "points": -0.824
+      }
+    ]
+  },
+  "Ohio": {
+    "intercept": 1.265,
+    "drivers": [
+      {
+        "feature": "sp_overall_lag1",
+        "points": -3.136
+      },
+      {
+        "feature": "ret_recv_ppa",
+        "points": -1.673
+      },
+      {
+        "feature": "ret_usage",
+        "points": 1.444
+      },
+      {
+        "feature": "bluechip_mean4",
+        "points": -1.128
+      },
+      {
+        "feature": "talent_delta",
+        "points": 0.451
+      },
+      {
+        "feature": "sp_overall_lag3",
+        "points": -0.423
+      }
+    ]
+  },
+  "Ohio State": {
+    "intercept": 1.265,
+    "drivers": [
+      {
+        "feature": "sp_overall_lag1",
+        "points": 16.892
+      },
+      {
+        "feature": "recruit_points",
+        "points": 5.035
+      },
+      {
+        "feature": "bluechip_mean4",
+        "points": 4.163
+      },
+      {
+        "feature": "sp_overall_lag3",
+        "points": 3.215
+      },
+      {
+        "feature": "sp_wavg3",
+        "points": -2.905
+      },
+      {
+        "feature": "ret_usage",
+        "points": 0.712
+      }
+    ]
+  },
+  "Oklahoma": {
+    "intercept": 1.265,
+    "drivers": [
+      {
+        "feature": "sp_overall_lag1",
+        "points": 9.961
+      },
+      {
+        "feature": "bluechip_mean4",
+        "points": 3.227
+      },
+      {
+        "feature": "recruit_points",
+        "points": 3.199
+      },
+      {
+        "feature": "sp_overall_lag3",
+        "points": 1.831
+      },
+      {
+        "feature": "sp_wavg3",
+        "points": -1.401
+      },
+      {
+        "feature": "ret_usage",
+        "points": 0.931
+      }
+    ]
+  },
+  "Oklahoma State": {
+    "intercept": 1.265,
+    "drivers": [
+      {
+        "feature": "sp_overall_lag1",
+        "points": -9.655
+      },
+      {
+        "feature": "ret_usage",
+        "points": -3.472
+      },
+      {
+        "feature": "ret_recv_ppa",
+        "points": -2.359
+      },
+      {
+        "feature": "coach_change",
+        "points": -1.583
+      },
+      {
+        "feature": "bluechip_mean4",
+        "points": -1.128
+      },
+      {
+        "feature": "sp_wavg3",
+        "points": 0.887
+      }
+    ]
+  },
+  "Old Dominion": {
+    "intercept": 1.265,
+    "drivers": [
+      {
+        "feature": "sp_overall_lag1",
+        "points": 2.679
+      },
+      {
+        "feature": "ret_usage",
+        "points": -1.666
+      },
+      {
+        "feature": "ret_recv_ppa",
+        "points": -1.624
+      },
+      {
+        "feature": "sp_overall_lag3",
+        "points": -1.576
+      },
+      {
+        "feature": "bluechip_mean4",
+        "points": -1.128
+      },
+      {
+        "feature": "talent_delta",
+        "points": 0.605
+      }
+    ]
+  },
+  "Ole Miss": {
+    "intercept": 1.265,
+    "drivers": [
+      {
+        "feature": "sp_overall_lag1",
+        "points": 13.309
+      },
+      {
+        "feature": "recruit_points",
+        "points": 2.602
+      },
+      {
+        "feature": "sp_wavg3",
+        "points": -2.343
+      },
+      {
+        "feature": "sp_overall_lag3",
+        "points": 2.292
+      },
+      {
+        "feature": "bluechip_mean4",
+        "points": 2.058
+      },
+      {
+        "feature": "ret_recv_ppa",
+        "points": -1.567
+      }
+    ]
+  },
+  "Oregon": {
+    "intercept": 1.265,
+    "drivers": [
+      {
+        "feature": "sp_overall_lag1",
+        "points": 14.425
+      },
+      {
+        "feature": "recruit_points",
+        "points": 5.11
+      },
+      {
+        "feature": "bluechip_mean4",
+        "points": 4.105
+      },
+      {
+        "feature": "sp_overall_lag3",
+        "points": 3.351
+      },
+      {
+        "feature": "sp_wavg3",
+        "points": -2.545
+      },
+      {
+        "feature": "ret_usage",
+        "points": 0.482
+      }
+    ]
+  },
+  "Oregon State": {
+    "intercept": 1.265,
+    "drivers": [
+      {
+        "feature": "sp_overall_lag1",
+        "points": -10.125
+      },
+      {
+        "feature": "coach_change",
+        "points": -1.583
+      },
+      {
+        "feature": "sp_overall_lag3",
+        "points": 1.505
+      },
+      {
+        "feature": "sp_wavg3",
+        "points": 0.934
+      },
+      {
+        "feature": "bluechip_mean4",
+        "points": -0.818
+      },
+      {
+        "feature": "ret_recv_ppa",
+        "points": -0.689
+      }
+    ]
+  },
+  "Penn State": {
+    "intercept": 1.265,
+    "drivers": [
+      {
+        "feature": "sp_overall_lag1",
+        "points": 9.844
+      },
+      {
+        "feature": "ret_usage",
+        "points": -3.266
+      },
+      {
+        "feature": "bluechip_mean4",
+        "points": 3.165
+      },
+      {
+        "feature": "sp_overall_lag3",
+        "points": 2.985
+      },
+      {
+        "feature": "sp_wavg3",
+        "points": -2.039
+      },
+      {
+        "feature": "ret_recv_ppa",
+        "points": -1.767
+      }
+    ]
+  },
+  "Pittsburgh": {
+    "intercept": 1.265,
+    "drivers": [
+      {
+        "feature": "sp_overall_lag1",
+        "points": 4.147
+      },
+      {
+        "feature": "recruit_points",
+        "points": 1.749
+      },
+      {
+        "feature": "ret_recv_ppa",
+        "points": -1.379
+      },
+      {
+        "feature": "sp_overall_lag3",
+        "points": -1.196
+      },
+      {
+        "feature": "ret_usage",
+        "points": -0.492
+      },
+      {
+        "feature": "coach_change",
+        "points": 0.4
+      }
+    ]
+  },
+  "Purdue": {
+    "intercept": 1.265,
+    "drivers": [
+      {
+        "feature": "sp_overall_lag1",
+        "points": -4.369
+      },
+      {
+        "feature": "ret_recv_ppa",
+        "points": -1.477
+      },
+      {
+        "feature": "recruit_points",
+        "points": 1.342
+      },
+      {
+        "feature": "sp_overall_lag3",
+        "points": -1.196
+      },
+      {
+        "feature": "sp_wavg3",
+        "points": 1.135
+      },
+      {
+        "feature": "bluechip_mean4",
+        "points": -0.649
+      }
+    ]
+  },
+  "Rice": {
+    "intercept": 1.265,
+    "drivers": [
+      {
+        "feature": "sp_overall_lag1",
+        "points": -9.479
+      },
+      {
+        "feature": "ret_usage",
+        "points": -1.595
+      },
+      {
+        "feature": "sp_overall_lag3",
+        "points": -1.59
+      },
+      {
+        "feature": "sp_wavg3",
+        "points": 1.498
+      },
+      {
+        "feature": "bluechip_mean4",
+        "points": -1.128
+      },
+      {
+        "feature": "talent_delta",
+        "points": 0.529
+      }
+    ]
+  },
+  "Rutgers": {
+    "intercept": 1.265,
+    "drivers": [
+      {
+        "feature": "recruit_points",
+        "points": 1.998
+      },
+      {
+        "feature": "ret_usage",
+        "points": -1.07
+      },
+      {
+        "feature": "coach_change",
+        "points": 0.4
+      },
+      {
+        "feature": "sp_overall_lag3",
+        "points": 0.27
+      },
+      {
+        "feature": "sp_overall_lag1",
+        "points": -0.199
+      },
+      {
+        "feature": "sp_wavg3",
+        "points": -0.165
+      }
+    ]
+  },
+  "SMU": {
+    "intercept": 1.265,
+    "drivers": [
+      {
+        "feature": "sp_overall_lag1",
+        "points": 7.084
+      },
+      {
+        "feature": "recruit_points",
+        "points": 2.191
+      },
+      {
+        "feature": "sp_wavg3",
+        "points": -1.294
+      },
+      {
+        "feature": "sp_overall_lag3",
+        "points": 1.166
+      },
+      {
+        "feature": "ret_recv_ppa",
+        "points": -0.84
+      },
+      {
+        "feature": "coach_change",
+        "points": 0.4
+      }
+    ]
+  },
+  "Sacramento State": {
+    "intercept": 1.265,
+    "drivers": [
+      {
+        "feature": "bluechip_mean4",
+        "points": -1.128
+      },
+      {
+        "feature": "coach_change",
+        "points": 0.4
+      },
+      {
+        "feature": "recruit_points",
+        "points": -0.244
+      },
+      {
+        "feature": "sp_overall_lag1",
+        "points": 0.153
+      },
+      {
+        "feature": "ret_usage",
+        "points": 0.063
+      },
+      {
+        "feature": "sp_overall_lag3",
+        "points": 0.039
+      }
+    ]
+  },
+  "Sam Houston": {
+    "intercept": 1.265,
+    "drivers": [
+      {
+        "feature": "sp_overall_lag1",
+        "points": -17.114
+      },
+      {
+        "feature": "sp_wavg3",
+        "points": 2.109
+      },
+      {
+        "feature": "sp_overall_lag3",
+        "points": -2.079
+      },
+      {
+        "feature": "bluechip_mean4",
+        "points": -1.128
+      },
+      {
+        "feature": "talent_delta",
+        "points": 0.719
+      },
+      {
+        "feature": "coach_change",
+        "points": 0.4
+      }
+    ]
+  },
+  "San Diego State": {
+    "intercept": 1.265,
+    "drivers": [
+      {
+        "feature": "sp_overall_lag1",
+        "points": 3.149
+      },
+      {
+        "feature": "ret_usage",
+        "points": 2.418
+      },
+      {
+        "feature": "ret_recv_ppa",
+        "points": 1.614
+      },
+      {
+        "feature": "sp_overall_lag3",
+        "points": -1.604
+      },
+      {
+        "feature": "bluechip_mean4",
+        "points": -1.128
+      },
+      {
+        "feature": "recruit_points",
+        "points": 0.62
+      }
+    ]
+  },
+  "San Jos\u00e9 State": {
+    "intercept": 1.265,
+    "drivers": [
+      {
+        "feature": "sp_overall_lag1",
+        "points": -9.185
+      },
+      {
+        "feature": "ret_usage",
+        "points": -2.664
+      },
+      {
+        "feature": "ret_recv_ppa",
+        "points": -2.249
+      },
+      {
+        "feature": "sp_wavg3",
+        "points": 1.147
+      },
+      {
+        "feature": "bluechip_mean4",
+        "points": -1.128
+      },
+      {
+        "feature": "sp_overall_lag3",
+        "points": -0.667
+      }
+    ]
+  },
+  "South Alabama": {
+    "intercept": 1.265,
+    "drivers": [
+      {
+        "feature": "sp_overall_lag1",
+        "points": -8.245
+      },
+      {
+        "feature": "bluechip_mean4",
+        "points": -1.128
+      },
+      {
+        "feature": "ret_usage",
+        "points": 1.007
+      },
+      {
+        "feature": "ret_recv_ppa",
+        "points": 0.916
+      },
+      {
+        "feature": "recruit_points",
+        "points": 0.736
+      },
+      {
+        "feature": "sp_wavg3",
+        "points": 0.627
+      }
+    ]
+  },
+  "South Carolina": {
+    "intercept": 1.265,
+    "drivers": [
+      {
+        "feature": "recruit_points",
+        "points": 3.346
+      },
+      {
+        "feature": "bluechip_mean4",
+        "points": 2.688
+      },
+      {
+        "feature": "sp_overall_lag1",
+        "points": 2.679
+      },
+      {
+        "feature": "sp_wavg3",
+        "points": -0.764
+      },
+      {
+        "feature": "ret_usage",
+        "points": 0.518
+      },
+      {
+        "feature": "coach_change",
+        "points": 0.4
+      }
+    ]
+  },
+  "South Florida": {
+    "intercept": 1.265,
+    "drivers": [
+      {
+        "feature": "sp_overall_lag1",
+        "points": 6.026
+      },
+      {
+        "feature": "ret_usage",
+        "points": -2.522
+      },
+      {
+        "feature": "coach_change",
+        "points": -1.583
+      },
+      {
+        "feature": "ret_recv_ppa",
+        "points": -1.387
+      },
+      {
+        "feature": "sp_overall_lag3",
+        "points": -1.101
+      },
+      {
+        "feature": "bluechip_mean4",
+        "points": -1.059
+      }
+    ]
+  },
+  "Southern Miss": {
+    "intercept": 1.265,
+    "drivers": [
+      {
+        "feature": "sp_overall_lag1",
+        "points": -4.956
+      },
+      {
+        "feature": "sp_overall_lag3",
+        "points": -2.16
+      },
+      {
+        "feature": "ret_usage",
+        "points": 1.964
+      },
+      {
+        "feature": "sp_wavg3",
+        "points": 1.628
+      },
+      {
+        "feature": "bluechip_mean4",
+        "points": -1.128
+      },
+      {
+        "feature": "ret_recv_ppa",
+        "points": 0.985
+      }
+    ]
+  },
+  "Stanford": {
+    "intercept": 1.265,
+    "drivers": [
+      {
+        "feature": "sp_overall_lag1",
+        "points": -7.717
+      },
+      {
+        "feature": "recruit_points",
+        "points": 1.932
+      },
+      {
+        "feature": "sp_overall_lag3",
+        "points": -1.821
+      },
+      {
+        "feature": "ret_usage",
+        "points": -1.714
+      },
+      {
+        "feature": "coach_change",
+        "points": -1.583
+      },
+      {
+        "feature": "sp_wavg3",
+        "points": 1.278
+      }
+    ]
+  },
+  "Syracuse": {
+    "intercept": 1.265,
+    "drivers": [
+      {
+        "feature": "sp_overall_lag1",
+        "points": -8.48
+      },
+      {
+        "feature": "recruit_points",
+        "points": 2.152
+      },
+      {
+        "feature": "ret_usage",
+        "points": -1.761
+      },
+      {
+        "feature": "ret_recv_ppa",
+        "points": -1.542
+      },
+      {
+        "feature": "sp_overall_lag3",
+        "points": -0.803
+      },
+      {
+        "feature": "sp_wavg3",
+        "points": 0.761
+      }
+    ]
+  },
+  "TCU": {
+    "intercept": 1.265,
+    "drivers": [
+      {
+        "feature": "sp_overall_lag1",
+        "points": 4.088
+      },
+      {
+        "feature": "ret_usage",
+        "points": -1.991
+      },
+      {
+        "feature": "recruit_points",
+        "points": 1.693
+      },
+      {
+        "feature": "ret_recv_ppa",
+        "points": -1.171
+      },
+      {
+        "feature": "sp_overall_lag3",
+        "points": 0.867
+      },
+      {
+        "feature": "sp_wavg3",
+        "points": -0.774
+      }
+    ]
+  },
+  "Temple": {
+    "intercept": 1.265,
+    "drivers": [
+      {
+        "feature": "sp_overall_lag1",
+        "points": -3.782
+      },
+      {
+        "feature": "sp_overall_lag3",
+        "points": -3.056
+      },
+      {
+        "feature": "ret_usage",
+        "points": -1.749
+      },
+      {
+        "feature": "sp_wavg3",
+        "points": 1.496
+      },
+      {
+        "feature": "talent_delta",
+        "points": 1.228
+      },
+      {
+        "feature": "bluechip_mean4",
+        "points": -1.128
+      }
+    ]
+  },
+  "Tennessee": {
+    "intercept": 1.265,
+    "drivers": [
+      {
+        "feature": "sp_overall_lag1",
+        "points": 8.023
+      },
+      {
+        "feature": "recruit_points",
+        "points": 4.638
+      },
+      {
+        "feature": "bluechip_mean4",
+        "points": 3.094
+      },
+      {
+        "feature": "sp_overall_lag3",
+        "points": 1.994
+      },
+      {
+        "feature": "sp_wavg3",
+        "points": -1.645
+      },
+      {
+        "feature": "ret_usage",
+        "points": -1.306
+      }
+    ]
+  },
+  "Texas": {
+    "intercept": 1.265,
+    "drivers": [
+      {
+        "feature": "sp_overall_lag1",
+        "points": 8.728
+      },
+      {
+        "feature": "recruit_points",
+        "points": 4.656
+      },
+      {
+        "feature": "bluechip_mean4",
+        "points": 4.293
+      },
+      {
+        "feature": "sp_overall_lag3",
+        "points": 2.944
+      },
+      {
+        "feature": "sp_wavg3",
+        "points": -1.918
+      },
+      {
+        "feature": "coach_change",
+        "points": 0.4
+      }
+    ]
+  },
+  "Texas A&M": {
+    "intercept": 1.265,
+    "drivers": [
+      {
+        "feature": "sp_overall_lag1",
+        "points": 11.371
+      },
+      {
+        "feature": "bluechip_mean4",
+        "points": 4.873
+      },
+      {
+        "feature": "recruit_points",
+        "points": 4.352
+      },
+      {
+        "feature": "sp_overall_lag3",
+        "points": 1.912
+      },
+      {
+        "feature": "sp_wavg3",
+        "points": -1.773
+      },
+      {
+        "feature": "ret_usage",
+        "points": 0.671
+      }
+    ]
+  },
+  "Texas State": {
+    "intercept": 1.265,
+    "drivers": [
+      {
+        "feature": "bluechip_mean4",
+        "points": -1.128
+      },
+      {
+        "feature": "ret_recv_ppa",
+        "points": 0.871
+      },
+      {
+        "feature": "recruit_points",
+        "points": 0.777
+      },
+      {
+        "feature": "sp_overall_lag1",
+        "points": 0.564
+      },
+      {
+        "feature": "ret_usage",
+        "points": 0.464
+      },
+      {
+        "feature": "sp_overall_lag3",
+        "points": -0.423
+      }
+    ]
+  },
+  "Texas Tech": {
+    "intercept": 1.265,
+    "drivers": [
+      {
+        "feature": "sp_overall_lag1",
+        "points": 15.423
+      },
+      {
+        "feature": "recruit_points",
+        "points": 3.113
+      },
+      {
+        "feature": "sp_wavg3",
+        "points": -1.538
+      },
+      {
+        "feature": "bluechip_mean4",
+        "points": 0.965
+      },
+      {
+        "feature": "sp_overall_lag3",
+        "points": 0.623
+      },
+      {
+        "feature": "coach_change",
+        "points": 0.4
+      }
+    ]
+  },
+  "Toledo": {
+    "intercept": 1.265,
+    "drivers": [
+      {
+        "feature": "sp_overall_lag1",
+        "points": 2.737
+      },
+      {
+        "feature": "coach_change",
+        "points": -1.583
+      },
+      {
+        "feature": "bluechip_mean4",
+        "points": -1.128
+      },
+      {
+        "feature": "talent_delta",
+        "points": -0.837
+      },
+      {
+        "feature": "sp_overall_lag3",
+        "points": 0.297
+      },
+      {
+        "feature": "recruit_points",
+        "points": -0.196
+      }
+    ]
+  },
+  "Troy": {
+    "intercept": 1.265,
+    "drivers": [
+      {
+        "feature": "sp_overall_lag1",
+        "points": -3.606
+      },
+      {
+        "feature": "ret_recv_ppa",
+        "points": -1.885
+      },
+      {
+        "feature": "bluechip_mean4",
+        "points": -1.128
+      },
+      {
+        "feature": "sp_overall_lag3",
+        "points": 1.125
+      },
+      {
+        "feature": "recruit_points",
+        "points": 0.737
+      },
+      {
+        "feature": "sp_wavg3",
+        "points": 0.412
+      }
+    ]
+  },
+  "Tulane": {
+    "intercept": 1.265,
+    "drivers": [
+      {
+        "feature": "sp_overall_lag1",
+        "points": 2.914
+      },
+      {
+        "feature": "ret_usage",
+        "points": -2.38
+      },
+      {
+        "feature": "coach_change",
+        "points": -1.583
+      },
+      {
+        "feature": "ret_recv_ppa",
+        "points": -1.204
+      },
+      {
+        "feature": "recruit_points",
+        "points": 1.034
+      },
+      {
+        "feature": "bluechip_mean4",
+        "points": -0.84
+      }
+    ]
+  },
+  "Tulsa": {
+    "intercept": 1.265,
+    "drivers": [
+      {
+        "feature": "sp_overall_lag1",
+        "points": -6.66
+      },
+      {
+        "feature": "sp_overall_lag3",
+        "points": -2.065
+      },
+      {
+        "feature": "sp_wavg3",
+        "points": 1.609
+      },
+      {
+        "feature": "bluechip_mean4",
+        "points": -1.128
+      },
+      {
+        "feature": "ret_usage",
+        "points": -1.111
+      },
+      {
+        "feature": "ret_recv_ppa",
+        "points": -0.644
+      }
+    ]
+  },
+  "UAB": {
+    "intercept": 1.265,
+    "drivers": [
+      {
+        "feature": "sp_overall_lag1",
+        "points": -10.066
+      },
+      {
+        "feature": "sp_overall_lag3",
+        "points": -2.201
+      },
+      {
+        "feature": "sp_wavg3",
+        "points": 1.641
+      },
+      {
+        "feature": "coach_change",
+        "points": -1.583
+      },
+      {
+        "feature": "ret_usage",
+        "points": 1.574
+      },
+      {
+        "feature": "recruit_points",
+        "points": -1.222
+      }
+    ]
+  },
+  "UCF": {
+    "intercept": 1.265,
+    "drivers": [
+      {
+        "feature": "ret_usage",
+        "points": -2.316
+      },
+      {
+        "feature": "sp_overall_lag1",
+        "points": -1.491
+      },
+      {
+        "feature": "recruit_points",
+        "points": 1.003
+      },
+      {
+        "feature": "talent_delta",
+        "points": -0.55
+      },
+      {
+        "feature": "coach_change",
+        "points": 0.4
+      },
+      {
+        "feature": "bluechip_mean4",
+        "points": 0.39
+      }
+    ]
+  },
+  "UCLA": {
+    "intercept": 1.265,
+    "drivers": [
+      {
+        "feature": "sp_overall_lag1",
+        "points": -5.896
+      },
+      {
+        "feature": "coach_change",
+        "points": -1.583
+      },
+      {
+        "feature": "sp_overall_lag3",
+        "points": 1.111
+      },
+      {
+        "feature": "recruit_points",
+        "points": 1.088
+      },
+      {
+        "feature": "ret_recv_ppa",
+        "points": -0.979
+      },
+      {
+        "feature": "sp_wavg3",
+        "points": 0.451
+      }
+    ]
+  },
+  "UConn": {
+    "intercept": 1.265,
+    "drivers": [
+      {
+        "feature": "ret_usage",
+        "points": -3.313
+      },
+      {
+        "feature": "sp_overall_lag3",
+        "points": -2.323
+      },
+      {
+        "feature": "ret_recv_ppa",
+        "points": -2.261
+      },
+      {
+        "feature": "sp_overall_lag1",
+        "points": 2.209
+      },
+      {
+        "feature": "coach_change",
+        "points": -1.583
+      },
+      {
+        "feature": "bluechip_mean4",
+        "points": -1.128
+      }
+    ]
+  },
+  "UL Monroe": {
+    "intercept": 1.265,
+    "drivers": [
+      {
+        "feature": "sp_overall_lag1",
+        "points": -13.472
+      },
+      {
+        "feature": "sp_overall_lag3",
+        "points": -3.138
+      },
+      {
+        "feature": "sp_wavg3",
+        "points": 2.255
+      },
+      {
+        "feature": "ret_recv_ppa",
+        "points": -1.302
+      },
+      {
+        "feature": "bluechip_mean4",
+        "points": -1.128
+      },
+      {
+        "feature": "ret_usage",
+        "points": -0.769
+      }
+    ]
+  },
+  "UNLV": {
+    "intercept": 1.265,
+    "drivers": [
+      {
+        "feature": "ret_usage",
+        "points": -1.873
+      },
+      {
+        "feature": "ret_recv_ppa",
+        "points": -1.775
+      },
+      {
+        "feature": "sp_overall_lag1",
+        "points": 1.739
+      },
+      {
+        "feature": "bluechip_mean4",
+        "points": -1.128
+      },
+      {
+        "feature": "recruit_points",
+        "points": 1.084
+      },
+      {
+        "feature": "coach_change",
+        "points": 0.4
+      }
+    ]
+  },
+  "USC": {
+    "intercept": 1.265,
+    "drivers": [
+      {
+        "feature": "sp_overall_lag1",
+        "points": 9.139
+      },
+      {
+        "feature": "recruit_points",
+        "points": 5.391
+      },
+      {
+        "feature": "bluechip_mean4",
+        "points": 2.778
+      },
+      {
+        "feature": "sp_wavg3",
+        "points": -1.287
+      },
+      {
+        "feature": "ret_recv_ppa",
+        "points": -1.261
+      },
+      {
+        "feature": "sp_overall_lag3",
+        "points": 1.071
+      }
+    ]
+  },
+  "UTEP": {
+    "intercept": 1.265,
+    "drivers": [
+      {
+        "feature": "sp_overall_lag1",
+        "points": -11.064
+      },
+      {
+        "feature": "ret_usage",
+        "points": -2.894
+      },
+      {
+        "feature": "sp_overall_lag3",
+        "points": -2.405
+      },
+      {
+        "feature": "sp_wavg3",
+        "points": 2.116
+      },
+      {
+        "feature": "ret_recv_ppa",
+        "points": -1.734
+      },
+      {
+        "feature": "bluechip_mean4",
+        "points": -1.128
+      }
+    ]
+  },
+  "UTSA": {
+    "intercept": 1.265,
+    "drivers": [
+      {
+        "feature": "sp_overall_lag1",
+        "points": 1.387
+      },
+      {
+        "feature": "bluechip_mean4",
+        "points": -0.986
+      },
+      {
+        "feature": "recruit_points",
+        "points": 0.683
+      },
+      {
+        "feature": "ret_usage",
+        "points": 0.659
+      },
+      {
+        "feature": "sp_overall_lag3",
+        "points": 0.528
+      },
+      {
+        "feature": "coach_change",
+        "points": 0.4
+      }
+    ]
+  },
+  "Utah": {
+    "intercept": 1.265,
+    "drivers": [
+      {
+        "feature": "sp_overall_lag1",
+        "points": 12.252
+      },
+      {
+        "feature": "recruit_points",
+        "points": 2.232
+      },
+      {
+        "feature": "sp_wavg3",
+        "points": -1.413
+      },
+      {
+        "feature": "ret_recv_ppa",
+        "points": -1.191
+      },
+      {
+        "feature": "sp_overall_lag3",
+        "points": 0.948
+      },
+      {
+        "feature": "ret_usage",
+        "points": 0.748
+      }
+    ]
+  },
+  "Utah State": {
+    "intercept": 1.265,
+    "drivers": [
+      {
+        "feature": "sp_overall_lag1",
+        "points": -2.607
+      },
+      {
+        "feature": "sp_overall_lag3",
+        "points": -1.685
+      },
+      {
+        "feature": "bluechip_mean4",
+        "points": -1.128
+      },
+      {
+        "feature": "sp_wavg3",
+        "points": 0.873
+      },
+      {
+        "feature": "ret_usage",
+        "points": 0.706
+      },
+      {
+        "feature": "coach_change",
+        "points": 0.4
+      }
+    ]
+  },
+  "Vanderbilt": {
+    "intercept": 1.265,
+    "drivers": [
+      {
+        "feature": "sp_overall_lag1",
+        "points": 11.136
+      },
+      {
+        "feature": "recruit_points",
+        "points": 2.177
+      },
+      {
+        "feature": "sp_overall_lag3",
+        "points": -1.929
+      },
+      {
+        "feature": "ret_usage",
+        "points": -1.548
+      },
+      {
+        "feature": "sp_wavg3",
+        "points": -0.785
+      },
+      {
+        "feature": "coach_change",
+        "points": 0.4
+      }
+    ]
+  },
+  "Virginia": {
+    "intercept": 1.265,
+    "drivers": [
+      {
+        "feature": "sp_overall_lag1",
+        "points": 5.733
+      },
+      {
+        "feature": "ret_usage",
+        "points": -2.67
+      },
+      {
+        "feature": "ret_recv_ppa",
+        "points": -2.004
+      },
+      {
+        "feature": "sp_overall_lag3",
+        "points": -1.671
+      },
+      {
+        "feature": "bluechip_mean4",
+        "points": -1.128
+      },
+      {
+        "feature": "coach_change",
+        "points": 0.4
+      }
+    ]
+  },
+  "Virginia Tech": {
+    "intercept": 1.265,
+    "drivers": [
+      {
+        "feature": "sp_overall_lag1",
+        "points": -6.718
+      },
+      {
+        "feature": "recruit_points",
+        "points": 2.207
+      },
+      {
+        "feature": "ret_usage",
+        "points": -1.837
+      },
+      {
+        "feature": "coach_change",
+        "points": -1.583
+      },
+      {
+        "feature": "sp_overall_lag3",
+        "points": 0.582
+      },
+      {
+        "feature": "bluechip_mean4",
+        "points": 0.506
+      }
+    ]
+  },
+  "Wake Forest": {
+    "intercept": 1.265,
+    "drivers": [
+      {
+        "feature": "ret_usage",
+        "points": -2.758
+      },
+      {
+        "feature": "sp_overall_lag1",
+        "points": 2.561
+      },
+      {
+        "feature": "recruit_points",
+        "points": 1.891
+      },
+      {
+        "feature": "ret_recv_ppa",
+        "points": -1.824
+      },
+      {
+        "feature": "sp_overall_lag3",
+        "points": -1.278
+      },
+      {
+        "feature": "bluechip_mean4",
+        "points": -0.865
+      }
+    ]
+  },
+  "Washington": {
+    "intercept": 1.265,
+    "drivers": [
+      {
+        "feature": "sp_overall_lag1",
+        "points": 10.02
+      },
+      {
+        "feature": "recruit_points",
+        "points": 3.568
+      },
+      {
+        "feature": "sp_overall_lag3",
+        "points": 2.021
+      },
+      {
+        "feature": "sp_wavg3",
+        "points": -1.236
+      },
+      {
+        "feature": "bluechip_mean4",
+        "points": 1.128
+      },
+      {
+        "feature": "ret_recv_ppa",
+        "points": -0.963
+      }
+    ]
+  },
+  "Washington State": {
+    "intercept": 1.265,
+    "drivers": [
+      {
+        "feature": "ret_usage",
+        "points": 2.282
+      },
+      {
+        "feature": "coach_change",
+        "points": -1.583
+      },
+      {
+        "feature": "sp_overall_lag1",
+        "points": 1.445
+      },
+      {
+        "feature": "bluechip_mean4",
+        "points": -1.128
+      },
+      {
+        "feature": "ret_recv_ppa",
+        "points": 1.099
+      },
+      {
+        "feature": "talent_delta",
+        "points": 0.54
+      }
+    ]
+  },
+  "West Virginia": {
+    "intercept": 1.265,
+    "drivers": [
+      {
+        "feature": "sp_overall_lag1",
+        "points": -4.78
+      },
+      {
+        "feature": "recruit_points",
+        "points": 2.331
+      },
+      {
+        "feature": "ret_recv_ppa",
+        "points": -1.975
+      },
+      {
+        "feature": "ret_usage",
+        "points": -1.926
+      },
+      {
+        "feature": "sp_overall_lag3",
+        "points": 0.813
+      },
+      {
+        "feature": "bluechip_mean4",
+        "points": -0.48
+      }
+    ]
+  },
+  "Western Kentucky": {
+    "intercept": 1.265,
+    "drivers": [
+      {
+        "feature": "ret_usage",
+        "points": 1.155
+      },
+      {
+        "feature": "bluechip_mean4",
+        "points": -1.128
+      },
+      {
+        "feature": "ret_recv_ppa",
+        "points": 1.103
+      },
+      {
+        "feature": "recruit_points",
+        "points": 0.66
+      },
+      {
+        "feature": "sp_overall_lag3",
+        "points": -0.477
+      },
+      {
+        "feature": "talent_delta",
+        "points": 0.422
+      }
+    ]
+  },
+  "Western Michigan": {
+    "intercept": 1.265,
+    "drivers": [
+      {
+        "feature": "ret_usage",
+        "points": 2.43
+      },
+      {
+        "feature": "sp_overall_lag3",
+        "points": -2.364
+      },
+      {
+        "feature": "ret_recv_ppa",
+        "points": 1.724
+      },
+      {
+        "feature": "sp_overall_lag1",
+        "points": -1.609
+      },
+      {
+        "feature": "bluechip_mean4",
+        "points": -1.128
+      },
+      {
+        "feature": "sp_wavg3",
+        "points": 0.882
+      }
+    ]
+  },
+  "Wisconsin": {
+    "intercept": 1.265,
+    "drivers": [
+      {
+        "feature": "sp_overall_lag1",
+        "points": -3.371
+      },
+      {
+        "feature": "sp_overall_lag3",
+        "points": 1.071
+      },
+      {
+        "feature": "ret_recv_ppa",
+        "points": -0.983
+      },
+      {
+        "feature": "bluechip_mean4",
+        "points": 0.721
+      },
+      {
+        "feature": "recruit_points",
+        "points": 0.718
+      },
+      {
+        "feature": "ret_usage",
+        "points": -0.71
+      }
+    ]
+  },
+  "Wyoming": {
+    "intercept": 1.265,
+    "drivers": [
+      {
+        "feature": "sp_overall_lag1",
+        "points": -7.423
+      },
+      {
+        "feature": "ret_usage",
+        "points": -1.814
+      },
+      {
+        "feature": "ret_recv_ppa",
+        "points": -1.538
+      },
+      {
+        "feature": "sp_wavg3",
+        "points": 1.247
+      },
+      {
+        "feature": "bluechip_mean4",
+        "points": -1.128
+      },
+      {
+        "feature": "sp_overall_lag3",
+        "points": -0.694
+      }
+    ]
+  }
+}
