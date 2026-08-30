@@ -1,0 +1,85 @@
+{
+  "n_games": 8584,
+  "intercept": 0.0,
+  "rating_diff_coef": 0.8945737319141672,
+  "home_field_advantage": 2.703218554671783,
+  "residual_sd": 17.469872841689142,
+  "n_neutral_games": 260,
+  "neutral_residual_sd": 16.30819342050613,
+  "method": "walk-forward preseason predictions",
+  "min_season": 2014,
+  "development_seasons": [
+    2014,
+    2015,
+    2016,
+    2017,
+    2018,
+    2019,
+    2020,
+    2021,
+    2022
+  ],
+  "holdout_seasons": [
+    2023,
+    2024,
+    2025
+  ],
+  "holdout_metrics": {
+    "n_games": 2264,
+    "brier": 0.20421380593531416,
+    "log_loss": 0.5910260175250086,
+    "accuracy": 0.6709363957597173,
+    "calibration_bins": [
+      {
+        "predicted": 0.0625,
+        "observed": 0.0741,
+        "n": 27
+      },
+      {
+        "predicted": 0.1559,
+        "observed": 0.2088,
+        "n": 91
+      },
+      {
+        "predicted": 0.2556,
+        "observed": 0.2717,
+        "n": 173
+      },
+      {
+        "predicted": 0.3531,
+        "observed": 0.4479,
+        "n": 259
+      },
+      {
+        "predicted": 0.452,
+        "observed": 0.4874,
+        "n": 318
+      },
+      {
+        "predicted": 0.5502,
+        "observed": 0.5718,
+        "n": 355
+      },
+      {
+        "predicted": 0.6503,
+        "observed": 0.625,
+        "n": 336
+      },
+      {
+        "predicted": 0.7509,
+        "observed": 0.7565,
+        "n": 308
+      },
+      {
+        "predicted": 0.849,
+        "observed": 0.8089,
+        "n": 246
+      },
+      {
+        "predicted": 0.9466,
+        "observed": 0.9603,
+        "n": 151
+      }
+    ]
+  }
+}

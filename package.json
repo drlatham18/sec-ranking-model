@@ -1,0 +1,13 @@
+{
+  "name": "hedges-and-margins",
+  "version": "1.0.0",
+  "private": true,
+  "type": "module",
+  "scripts": {
+    "build": "python src/build_ui.py && vite build && node scripts/prepare-site.mjs"
+  },
+  "devDependencies": {
+    "@openai/sites-vite-plugin": "0.2.0",
+    "vite": "8.2.2"
+  }
+}

@@ -1,0 +1,572 @@
+{
+  "target": "sp_overall",
+  "trained_through_season": 2025,
+  "test_seasons": [
+    2014,
+    2015,
+    2016,
+    2017,
+    2018,
+    2019,
+    2020,
+    2021,
+    2022,
+    2023,
+    2024,
+    2025
+  ],
+  "development_seasons": [
+    2014,
+    2015,
+    2016,
+    2017,
+    2018,
+    2019,
+    2020,
+    2021,
+    2022
+  ],
+  "holdout_seasons": [
+    2023,
+    2024,
+    2025
+  ],
+  "configurations": {
+    "baseline_prior_year_only": {
+      "rmse": 8.364774233714549,
+      "mae": 6.684341473126261,
+      "r2": 0.568304648743377,
+      "spearman": 0.7341280240077386,
+      "seasons": 3,
+      "features": [
+        "sp_overall_lag1"
+      ]
+    },
+    "baseline_3yr_weighted": {
+      "rmse": 8.69039117899247,
+      "mae": 6.887237249628292,
+      "r2": 0.5342460393654177,
+      "spearman": 0.7133415582049967,
+      "seasons": 3,
+      "features": [
+        "sp_wavg3"
+      ]
+    },
+    "long_history_all": {
+      "rmse": 7.853589136470421,
+      "mae": 6.267449436931493,
+      "r2": 0.6195379238333583,
+      "spearman": 0.776260929509922,
+      "seasons": 3,
+      "features": [
+        "sp_overall_lag1",
+        "sp_overall_lag2",
+        "sp_overall_lag3",
+        "sp_wavg3",
+        "sp_mean3",
+        "sp_trend",
+        "sp_offense_lag1",
+        "sp_defense_lag1",
+        "margin_pg_lag1",
+        "wins_lag1",
+        "luck_lag1",
+        "close_win_pct_lag1",
+        "expected_wins_lag1",
+        "recruit_points",
+        "recruit_points_lag1",
+        "recruit_mean4",
+        "bluechip_ratio",
+        "bluechip_mean4",
+        "fivestars",
+        "coach_change",
+        "coach_tenure",
+        "conf_sp_mean"
+      ]
+    },
+    "modern_all": {
+      "rmse": 8.039438184217246,
+      "mae": 6.434670557866426,
+      "r2": 0.5995395630924497,
+      "spearman": 0.7713413915164539,
+      "seasons": 3,
+      "features": [
+        "sp_overall_lag1",
+        "sp_overall_lag2",
+        "sp_overall_lag3",
+        "sp_wavg3",
+        "sp_mean3",
+        "sp_trend",
+        "sp_offense_lag1",
+        "sp_defense_lag1",
+        "margin_pg_lag1",
+        "wins_lag1",
+        "luck_lag1",
+        "close_win_pct_lag1",
+        "expected_wins_lag1",
+        "recruit_points",
+        "recruit_points_lag1",
+        "recruit_mean4",
+        "bluechip_ratio",
+        "bluechip_mean4",
+        "fivestars",
+        "talent",
+        "talent_lag1",
+        "talent_delta",
+        "ret_ppa",
+        "ret_pass_ppa",
+        "ret_rush_ppa",
+        "ret_recv_ppa",
+        "ret_usage",
+        "ret_pass_usage",
+        "coach_change",
+        "coach_tenure",
+        "conf_sp_mean"
+      ]
+    },
+    "full_pool": {
+      "rmse": 8.12751200668812,
+      "mae": 6.523342892445864,
+      "r2": 0.5925680444940794,
+      "spearman": 0.7715948599412448,
+      "seasons": 3,
+      "features": [
+        "sp_overall_lag1",
+        "sp_overall_lag2",
+        "sp_overall_lag3",
+        "sp_wavg3",
+        "sp_mean3",
+        "sp_trend",
+        "sp_offense_lag1",
+        "sp_defense_lag1",
+        "margin_pg_lag1",
+        "wins_lag1",
+        "luck_lag1",
+        "close_win_pct_lag1",
+        "expected_wins_lag1",
+        "recruit_points",
+        "recruit_points_lag1",
+        "recruit_mean4",
+        "bluechip_ratio",
+        "bluechip_mean4",
+        "fivestars",
+        "talent",
+        "talent_lag1",
+        "talent_delta",
+        "ret_ppa",
+        "ret_pass_ppa",
+        "ret_rush_ppa",
+        "ret_recv_ppa",
+        "ret_usage",
+        "ret_pass_usage",
+        "portal_in",
+        "portal_out",
+        "portal_net",
+        "portal_in_val",
+        "portal_out_val",
+        "portal_net_val",
+        "portal_val_per_in",
+        "coach_change",
+        "coach_tenure",
+        "conf_sp_mean"
+      ]
+    },
+    "greedy_selected": {
+      "rmse": 8.049676464938813,
+      "mae": 6.423645329971936,
+      "r2": 0.5982864178463082,
+      "spearman": 0.7731638944972564,
+      "seasons": 3,
+      "features": [
+        "sp_overall_lag1",
+        "recruit_points",
+        "ret_usage",
+        "ret_recv_ppa",
+        "sp_overall_lag3",
+        "coach_change",
+        "bluechip_mean4",
+        "talent_delta",
+        "wins_lag1",
+        "sp_wavg3"
+      ]
+    }
+  },
+  "development_configurations": {
+    "baseline_prior_year_only": {
+      "rmse": 7.678319391371996,
+      "mae": 6.147928001186133,
+      "r2": 0.6479218823488286,
+      "spearman": 0.7903404467779177,
+      "seasons": 9,
+      "features": [
+        "sp_overall_lag1"
+      ]
+    },
+    "baseline_3yr_weighted": {
+      "rmse": 7.845924155970686,
+      "mae": 6.274985065817186,
+      "r2": 0.6331562431954997,
+      "spearman": 0.786281372575398,
+      "seasons": 9,
+      "features": [
+        "sp_wavg3"
+      ]
+    },
+    "long_history_all": {
+      "rmse": 7.252118063264152,
+      "mae": 5.8406904361022445,
+      "r2": 0.6847958369088072,
+      "spearman": 0.8208160405761709,
+      "seasons": 9,
+      "features": [
+        "sp_overall_lag1",
+        "sp_overall_lag2",
+        "sp_overall_lag3",
+        "sp_wavg3",
+        "sp_mean3",
+        "sp_trend",
+        "sp_offense_lag1",
+        "sp_defense_lag1",
+        "margin_pg_lag1",
+        "wins_lag1",
+        "luck_lag1",
+        "close_win_pct_lag1",
+        "expected_wins_lag1",
+        "recruit_points",
+        "recruit_points_lag1",
+        "recruit_mean4",
+        "bluechip_ratio",
+        "bluechip_mean4",
+        "fivestars",
+        "coach_change",
+        "coach_tenure",
+        "conf_sp_mean"
+      ]
+    },
+    "modern_all": {
+      "rmse": 7.663856219934104,
+      "mae": 5.660455927977839,
+      "r2": 0.6224917519805202,
+      "spearman": 0.8317105665300663,
+      "seasons": 9,
+      "features": [
+        "sp_overall_lag1",
+        "sp_overall_lag2",
+        "sp_overall_lag3",
+        "sp_wavg3",
+        "sp_mean3",
+        "sp_trend",
+        "sp_offense_lag1",
+        "sp_defense_lag1",
+        "margin_pg_lag1",
+        "wins_lag1",
+        "luck_lag1",
+        "close_win_pct_lag1",
+        "expected_wins_lag1",
+        "recruit_points",
+        "recruit_points_lag1",
+        "recruit_mean4",
+        "bluechip_ratio",
+        "bluechip_mean4",
+        "fivestars",
+        "talent",
+        "talent_lag1",
+        "talent_delta",
+        "ret_ppa",
+        "ret_pass_ppa",
+        "ret_rush_ppa",
+        "ret_recv_ppa",
+        "ret_usage",
+        "ret_pass_usage",
+        "coach_change",
+        "coach_tenure",
+        "conf_sp_mean"
+      ]
+    },
+    "full_pool": {
+      "rmse": 7.64168812224618,
+      "mae": 5.644402975440759,
+      "r2": 0.6244202525666811,
+      "spearman": 0.8348711418168784,
+      "seasons": 9,
+      "features": [
+        "sp_overall_lag1",
+        "sp_overall_lag2",
+        "sp_overall_lag3",
+        "sp_wavg3",
+        "sp_mean3",
+        "sp_trend",
+        "sp_offense_lag1",
+        "sp_defense_lag1",
+        "margin_pg_lag1",
+        "wins_lag1",
+        "luck_lag1",
+        "close_win_pct_lag1",
+        "expected_wins_lag1",
+        "recruit_points",
+        "recruit_points_lag1",
+        "recruit_mean4",
+        "bluechip_ratio",
+        "bluechip_mean4",
+        "fivestars",
+        "talent",
+        "talent_lag1",
+        "talent_delta",
+        "ret_ppa",
+        "ret_pass_ppa",
+        "ret_rush_ppa",
+        "ret_recv_ppa",
+        "ret_usage",
+        "ret_pass_usage",
+        "portal_in",
+        "portal_out",
+        "portal_net",
+        "portal_in_val",
+        "portal_out_val",
+        "portal_net_val",
+        "portal_val_per_in",
+        "coach_change",
+        "coach_tenure",
+        "conf_sp_mean"
+      ]
+    },
+    "greedy_selected": {
+      "rmse": 6.838364188990707,
+      "mae": 5.487839867044283,
+      "r2": 0.7186170692222341,
+      "spearman": 0.8372065686557507,
+      "seasons": 9,
+      "features": [
+        "sp_overall_lag1",
+        "recruit_points",
+        "ret_usage",
+        "ret_recv_ppa",
+        "sp_overall_lag3",
+        "coach_change",
+        "bluechip_mean4",
+        "talent_delta",
+        "wins_lag1",
+        "sp_wavg3"
+      ]
+    }
+  },
+  "winner": "greedy_selected",
+  "performance_claim": {
+    "split": "untouched holdout",
+    "seasons": [
+      2023,
+      2024,
+      2025
+    ],
+    "rmse": 8.049676464938813,
+    "mae": 6.423645329971936
+  },
+  "selected_features": [
+    "sp_overall_lag1",
+    "recruit_points",
+    "ret_usage",
+    "ret_recv_ppa",
+    "sp_overall_lag3",
+    "coach_change",
+    "bluechip_mean4",
+    "talent_delta",
+    "wins_lag1",
+    "sp_wavg3"
+  ],
+  "greedy_trail": [
+    {
+      "step": 1,
+      "added": "sp_overall_lag1",
+      "oos_rmse": 7.678319391371996
+    },
+    {
+      "step": 2,
+      "added": "recruit_points",
+      "oos_rmse": 7.363700833331579
+    },
+    {
+      "step": 3,
+      "added": "ret_usage",
+      "oos_rmse": 7.075720829915836
+    },
+    {
+      "step": 4,
+      "added": "ret_recv_ppa",
+      "oos_rmse": 6.985465519526517
+    },
+    {
+      "step": 5,
+      "added": "sp_overall_lag3",
+      "oos_rmse": 6.930965792832303
+    },
+    {
+      "step": 6,
+      "added": "coach_change",
+      "oos_rmse": 6.89360516623612
+    },
+    {
+      "step": 7,
+      "added": "bluechip_mean4",
+      "oos_rmse": 6.870207456239692
+    },
+    {
+      "step": 8,
+      "added": "talent_delta",
+      "oos_rmse": 6.854859310062874
+    },
+    {
+      "step": 9,
+      "added": "wins_lag1",
+      "oos_rmse": 6.846041395193477
+    },
+    {
+      "step": 10,
+      "added": "sp_wavg3",
+      "oos_rmse": 6.838364188990707
+    }
+  ],
+  "standardized_coefficients": {
+    "sp_overall_lag1": 7.972200852527266,
+    "recruit_points": 2.275409313147227,
+    "ret_usage": 0.9793881805076751,
+    "ret_recv_ppa": 0.6834958697562559,
+    "sp_overall_lag3": 1.7638901143112662,
+    "coach_change": -0.7954423197505325,
+    "bluechip_mean4": 1.7383745593864797,
+    "talent_delta": 0.35126560351009484,
+    "wins_lag1": 0.18587835352958848,
+    "sp_wavg3": -1.237902546999976
+  },
+  "ridge_alpha": 2.8942661247167516,
+  "block_ablation": [
+    {
+      "block": "prior_results",
+      "features_removed": [
+        "sp_overall_lag1",
+        "sp_overall_lag3",
+        "sp_wavg3",
+        "wins_lag1"
+      ],
+      "rmse_without": 8.881454289699882,
+      "rmse_delta": 2.0430901007091746
+    },
+    {
+      "block": "returning_production",
+      "features_removed": [
+        "ret_recv_ppa",
+        "ret_usage"
+      ],
+      "rmse_without": 7.188975746395403,
+      "rmse_delta": 0.3506115574046964
+    },
+    {
+      "block": "recruiting",
+      "features_removed": [
+        "recruit_points",
+        "bluechip_mean4"
+      ],
+      "rmse_without": 7.006815472622801,
+      "rmse_delta": 0.16845128363209394
+    },
+    {
+      "block": "coaching",
+      "features_removed": [
+        "coach_change"
+      ],
+      "rmse_without": 6.87407752286265,
+      "rmse_delta": 0.035713333871942865
+    },
+    {
+      "block": "roster_talent",
+      "features_removed": [
+        "talent_delta"
+      ],
+      "rmse_without": 6.855471662992504,
+      "rmse_delta": 0.01710747400179713
+    }
+  ],
+  "calibration": {
+    "n_games": 8584,
+    "intercept": 0.0,
+    "rating_diff_coef": 0.8945737319141672,
+    "home_field_advantage": 2.703218554671783,
+    "residual_sd": 17.469872841689142,
+    "n_neutral_games": 260,
+    "neutral_residual_sd": 16.30819342050613,
+    "method": "walk-forward preseason predictions",
+    "min_season": 2014,
+    "development_seasons": [
+      2014,
+      2015,
+      2016,
+      2017,
+      2018,
+      2019,
+      2020,
+      2021,
+      2022
+    ],
+    "holdout_seasons": [
+      2023,
+      2024,
+      2025
+    ],
+    "holdout_metrics": {
+      "n_games": 2264,
+      "brier": 0.20421380593531416,
+      "log_loss": 0.5910260175250086,
+      "accuracy": 0.6709363957597173,
+      "calibration_bins": [
+        {
+          "predicted": 0.0625,
+          "observed": 0.0741,
+          "n": 27
+        },
+        {
+          "predicted": 0.1559,
+          "observed": 0.2088,
+          "n": 91
+        },
+        {
+          "predicted": 0.2556,
+          "observed": 0.2717,
+          "n": 173
+        },
+        {
+          "predicted": 0.3531,
+          "observed": 0.4479,
+          "n": 259
+        },
+        {
+          "predicted": 0.452,
+          "observed": 0.4874,
+          "n": 318
+        },
+        {
+          "predicted": 0.5502,
+          "observed": 0.5718,
+          "n": 355
+        },
+        {
+          "predicted": 0.6503,
+          "observed": 0.625,
+          "n": 336
+        },
+        {
+          "predicted": 0.7509,
+          "observed": 0.7565,
+          "n": 308
+        },
+        {
+          "predicted": 0.849,
+          "observed": 0.8089,
+          "n": 246
+        },
+        {
+          "predicted": 0.9466,
+          "observed": 0.9603,
+          "n": 151
+        }
+      ]
+    }
+  }
+}
