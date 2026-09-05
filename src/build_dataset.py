@@ -6,6 +6,7 @@ Output: data/processed/panel.csv  (one row per team-season, national FBS)
 Key normalisation: CFBD has shipped both snake_case and camelCase payloads.
 Every dict is normalised to snake_case on ingest so either generation works.
 """
+from datetime import datetime, timezone
 import json
 import re
 import sys
@@ -186,12 +187,14 @@ def coaches(year):
     return rows
 
 
-def games(year):
+def games(year, season_status=None):
     rows = []
-    for gm in safe("games", year=year, seasonType="regular"):
+    schedule = safe("games", year=year, seasonType="regular", _required=True)
+    schedule = [gm for gm in schedule if g(gm, "home_team") and g(gm, "away_team")]
+    for gm in schedule:
         ht, at = g(gm, "home_team"), g(gm, "away_team")
         hp, ap = g(gm, "home_points"), g(gm, "away_points")
-        if not ht or not at or hp is None or ap is None:
+        if not ht or not at or hp is None or ap is None or gm.get("completed") is False:
             continue
         rows.append({
             "season": year, "week": g(gm, "week"),
@@ -202,11 +205,16 @@ def games(year):
             "home_conference": g(gm, "home_conference"),
             "away_conference": g(gm, "away_conference"),
         })
+    if season_status is not None:
+        season_status.append({"season": year, "scheduled": len(schedule),
+                              "completed": len(rows),
+                              "assembled_at": datetime.now(timezone.utc).isoformat()})
     return rows
 
 
 # ---------------------------------------------------------------- assembly
 def build(start=2005, end=2025):
+    season_status = []
     frames = {k: [] for k in
               ["sp", "rec", "tal", "rct", "blue", "ret", "por", "cch", "gms"]}
     for y in range(start, end + 1):
@@ -219,7 +227,7 @@ def build(start=2005, end=2025):
         frames["ret"] += returning_production(y)
         frames["por"] += portal(y)
         frames["cch"] += coaches(y)
-        frames["gms"] += games(y)
+        frames["gms"] += games(y, season_status)
 
     def df(k):
         d = pd.DataFrame(frames[k])
@@ -269,6 +277,7 @@ def build(start=2005, end=2025):
                            % thin.to_dict())
 
     panel.to_csv(OUT / "panel.csv", index=False)
+    pd.DataFrame(season_status).to_csv(OUT / "season_status.csv", index=False)
     quality = {
         "start_season": int(start), "end_season": int(end),
         "panel_rows": int(len(panel)), "game_rows": int(len(gms)),

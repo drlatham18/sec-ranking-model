@@ -143,3 +143,18 @@ block ablation, game-model constants).
 
 Rebuild the whole thing end to end with `python run_all.py`, then the two
 commands above.
+
+## Scheduled refresh and completed-season checks
+
+Scheduled data updates and model fitting stay on Body 1. Mac checkouts support
+backup and manual heavy workloads. `python run_all.py 2004 2026 --refresh`
+explicitly bypasses every API cache entry and requires the configured CFBD key.
+Without the flag, changing-season data expires after six hours and historical
+data after 30 days. Legacy cache files without a fetch timestamp refresh once.
+
+Dataset builds now save `data/processed/season_status.csv`, with the total
+regular-season schedule and final-score count. Fitting requires at least 90%
+completion, agreement with the games dataset, and February 1 after the season.
+Existing datasets must be rebuilt to create this provenance before refitting;
+fitting will fail clearly rather than guess from the number of played games.
+Committed model outputs are snapshots and are not refreshed by installing code.

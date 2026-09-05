@@ -12,6 +12,7 @@ Outputs (written to output/):
   selection.json     chosen configuration, selected features, fitted coefs
   calibration.json   game-level margin model + home-field advantage + sigma
 """
+from datetime import datetime, timezone
 import json
 import pathlib
 import sys
@@ -279,22 +280,35 @@ def calibrate_preseason_games(predictions, development_seasons,
 
 
 # ------------------------------------------------------------------ main
-def last_completed_season():
-    """Last season whose games are actually played.
+def last_completed_season(now=None):
+    """Require 90% scored regular-season games and the post-season cutoff.
 
-    SP+ is published preseason, so `sp_overall` existing for a season does NOT
-    mean the season happened. Anchor on real results instead: a season counts
-    as complete only if >=90% of its scheduled games have final scores.
+    A February 1 cutoff prevents preseason/early-season schedule snapshots
+    from qualifying before the football season (including postseason) ends.
+    The regular-season schedule denominator comes from the dataset build.
     """
-    gm = pd.read_csv(PROC / "games.csv")
-    played = gm.groupby("season").size()
-    return int(played[played > 100].index.max())
+    now = now or datetime.now(timezone.utc)
+    path = PROC / "season_status.csv"
+    if not path.exists():
+        raise RuntimeError("Missing schedule coverage: rebuild the dataset before fitting")
+    status = pd.read_csv(path).set_index("season")
+    played = pd.read_csv(PROC / "games.csv").groupby("season").size()
+    cutoff = now.year - (1 if now.month >= 2 else 2)
+    eligible = status[(status.index <= cutoff) & (status.scheduled > 100)
+                      & (status.completed <= status.scheduled)
+                      & (status.completed / status.scheduled >= .90)
+                      & (status.completed == played.reindex(status.index).fillna(0))]
+    if eligible.empty:
+        raise RuntimeError("No completed season with verified schedule coverage")
+    return int(eligible.index.max())
 
 
 def run(first_test=2014, last_test=None):
     feat = F.load()
     completed = last_completed_season()
     last_test = last_test or completed
+    if last_test > completed:
+        raise ValueError("Requested test season is not verified complete")
     test_seasons = list(range(first_test, last_test + 1))
     if len(test_seasons) < 6:
         raise ValueError("need at least six test seasons for development/holdout split")
