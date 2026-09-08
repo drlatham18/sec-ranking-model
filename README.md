@@ -146,7 +146,7 @@ commands above.
 
 ## Scheduled refresh and completed-season checks
 
-Scheduled data updates and model fitting stay on Body 1. Mac checkouts support
+Historical data updates and model fitting stay on Body 1. Mac checkouts support
 backup and manual heavy workloads. `python run_all.py 2004 2026 --refresh`
 explicitly bypasses every API cache entry and requires the configured CFBD key.
 Without the flag, changing-season data expires after six hours and historical
@@ -158,3 +158,51 @@ completion, agreement with the games dataset, and February 1 after the season.
 Existing datasets must be rebuilt to create this provenance before refitting;
 fitting will fail clearly rather than guess from the number of played games.
 Committed model outputs are snapshots and are not refreshed by installing code.
+
+## Results and week-to-week comparisons
+
+The **Week to week** tab compares projected win totals, actual records, outlook
+rank (ordered by projected total wins), and best-SEC-record odds against the
+previous completed week. An unfinished week is explicitly labeled partial.
+Strength ratings remain the fitted preseason forecast; this does not introduce
+an unvalidated in-season strength model. Weekly history is reconstructed with
+the same preseason ratings and only the results final by each week's cutoff.
+Expected wins are calculated directly from probabilities; stable per-game
+simulation draws prevent refresh noise from appearing as weekly movement.
+
+```bash
+# Lightweight results refresh; no historical pulls or model fitting:
+python src/export_data.py 2026 SEC --refresh
+python src/build_ui.py
+
+# Explicit keyless results source:
+python src/export_data.py 2026 SEC --source espn --refresh
+```
+
+CFBD is used when `CFBD_API_KEY` or `~/.cfbd_key` is configured. Otherwise the
+exporter uses ESPN's public SEC scoreboard. Explicit CFBD errors fail the build
+rather than silently publishing empty data. Both adapters require a final-game
+flag before locking a score. All 120 games are included, including FCS opponents;
+conference record denominators come from the actual nine-game 2026 schedule.
+Incomplete schedules are rejected before replacing the previous output.
+
+GitHub Pages now fetches results and checks integrity before every push/manual
+deployment. A failed refresh leaves the previously deployed site available.
+The page shows the source, check time, final-game count, and a stale-results
+notice after 48 hours. GitHub Actions refreshes results every six hours during
+August–December (00:17, 06:17, 12:17, and 18:17 UTC; GitHub may delay queued
+runs). Model fitting stays on Body 1. To manually refresh without a code change,
+run **Deploy GitHub Pages** from the repository's Actions tab.
+
+Stable public links always open the latest deployed data:
+
+- Main ranking: https://drlatham18.github.io/sec-ranking-model/
+- Weekly changes: https://drlatham18.github.io/sec-ranking-model/?tab=weekly
+- Results and schedule: https://drlatham18.github.io/sec-ranking-model/?tab=sched
+- Team example: https://drlatham18.github.io/sec-ranking-model/?tab=team&team=Tennessee
+
+Use the Share button to copy the current view. A weekly link with an explicit
+`week` query value selects that historical comparison; omit `week` to follow the
+latest week automatically. The season rolls over when a new preseason model is
+built and the workflow's export season is updated; scheduled score refreshes do
+not refit ratings or silently switch seasons.

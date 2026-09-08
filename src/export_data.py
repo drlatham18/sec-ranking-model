@@ -14,32 +14,12 @@ import pandas as pd
 
 sys.path.insert(0, str(pathlib.Path(__file__).resolve().parent))
 import build_dataset as BD
-import matchup as MU
+import schedule_data
+import weekly
 
 ROOT = pathlib.Path(__file__).resolve().parents[1]
 OUT = ROOT / "output"
 N_SIMS = 20000
-
-
-def fetch_schedule(season):
-    """All regular-season games for `season`, including ones not yet played."""
-    rows = []
-    for gm in BD.safe("games", year=season, seasonType="regular"):
-        ht, at = BD.g(gm, "home_team"), BD.g(gm, "away_team")
-        if not ht or not at:
-            continue
-        rows.append({
-            "week": BD.g(gm, "week"),
-            "start_date": BD.g(gm, "start_date"),
-            "home_team": ht, "away_team": at,
-            "home_conference": BD.g(gm, "home_conference"),
-            "away_conference": BD.g(gm, "away_conference"),
-            "home_points": BD.g(gm, "home_points"),
-            "away_points": BD.g(gm, "away_points"),
-            "neutral": bool(BD.g(gm, "neutral_site", default=False)),
-            "conference_game": bool(BD.g(gm, "conference_game", default=False)),
-        })
-    return pd.DataFrame(rows)
 
 
 def fcs_win_rate():
@@ -59,7 +39,7 @@ def fcs_win_rate():
     return float(won.mean()), int(len(one))
 
 
-def build(season=2026, conference="SEC"):
+def build(season=2026, conference="SEC", source="auto", refresh=False):
     ratings = pd.read_csv(OUT / ("ratings_%d.csv" % season))
     sel = json.loads((OUT / "selection.json").read_text())
     cal = json.loads((OUT / "calibration.json").read_text())
@@ -70,8 +50,11 @@ def build(season=2026, conference="SEC"):
     sec = ratings[ratings.conference == conference].copy()
     sec_teams = set(sec.team)
 
-    sched = fetch_schedule(season)
+    sched, source_info = schedule_data.fetch_schedule(season, source, refresh)
     sched = sched[sched.home_team.isin(sec_teams) | sched.away_team.isin(sec_teams)]
+
+    schedule_data.validate_schedule(sched, sec_teams)
+    p_fcs, n_fcs = fcs_win_rate()
 
     game_sd_n = cal["neutral_residual_sd"]
     game_sd_h = cal["residual_sd"]
@@ -83,86 +66,42 @@ def build(season=2026, conference="SEC"):
     games = []
     for _, r in sched.iterrows():
         rh, ra = rmap.get(r.home_team), rmap.get(r.away_team)
-        if rh is None or ra is None:
-            continue  # FCS or unrated opponent
+        unrated = rh is None or ra is None
         hf = 0.0 if r.neutral else 1.0
-        margin = cal["intercept"] + b1 * (rh - ra) + cal["home_field_advantage"] * hf
+        margin = (None if unrated else
+                  cal["intercept"] + b1 * (rh - ra) + cal["home_field_advantage"] * hf)
         sd = float(np.sqrt((game_sd_n if r.neutral else game_sd_h) ** 2 + extra))
-        p_home = float(norm.cdf(margin / sd))
+        p_home = (p_fcs if rh is not None else 1 - p_fcs) if unrated else float(norm.cdf(margin / sd))
         games.append({
+            "id": str(r.id),
             "week": int(r.week) if pd.notna(r.week) else None,
             "date": str(r.start_date)[:10] if r.start_date else None,
             "home": r.home_team, "away": r.away_team,
             "home_conf": r.home_conference, "away_conf": r.away_conference,
             "neutral": bool(r.neutral), "conf_game": bool(r.conference_game),
-            "home_rating": round(rh, 2), "away_rating": round(ra, 2),
-            "margin_home": round(margin, 2), "p_home": round(p_home, 4),
+            "home_rating": round(rh, 2) if rh is not None else None,
+            "away_rating": round(ra, 2) if ra is not None else None,
+            "margin_home": round(margin, 2) if margin is not None else None,
+            "unrated": unrated, "p_home": round(p_home, 4),
             "sd": round(sd, 2),
-            "played": bool(pd.notna(r.home_points) and pd.notna(r.away_points)),
+            "played": bool(r.completed),
             "home_points": None if pd.isna(r.home_points) else int(r.home_points),
             "away_points": None if pd.isna(r.away_points) else int(r.away_points),
         })
 
-    # ---- Monte Carlo season simulation (SEC teams only)
+    # Each weekly comparison uses identical ratings, probabilities, and random
+    # draws. Only games that are final by that week become fixed outcomes.
     teams = sorted(sec_teams)
-    idx = {t: i for i, t in enumerate(teams)}
-    rng = np.random.default_rng(20260829)
-    wins = np.zeros((N_SIMS, len(teams)))
-    cwins = np.zeros((N_SIMS, len(teams)))
-    for g in games:
-        h, a = g["home"], g["away"]
-        if g["played"]:
-            draw = np.full(N_SIMS, g["home_points"] > g["away_points"],
-                           dtype=bool)
-        else:
-            draw = rng.random(N_SIMS) < g["p_home"]
-        if h in idx:
-            wins[:, idx[h]] += draw
-            if g["conf_game"]:
-                cwins[:, idx[h]] += draw
-        if a in idx:
-            wins[:, idx[a]] += ~draw
-            if g["conf_game"]:
-                cwins[:, idx[a]] += ~draw
-
-    # Unrated (FCS) opponents: simulated at the historically observed FBS win
-    # rate against them, so those games are neither ignored nor assumed certain.
-    p_fcs, n_fcs = fcs_win_rate()
-    unrated = {t: 0 for t in teams}
-    for _, r in sched.iterrows():
-        for me, opp in ((r.home_team, r.away_team), (r.away_team, r.home_team)):
-            if me in unrated and opp not in rmap:
-                unrated[me] += 1
-                if pd.notna(r.home_points) and pd.notna(r.away_points):
-                    me_home = me == r.home_team
-                    won = ((r.home_points > r.away_points) if me_home
-                           else (r.away_points > r.home_points))
-                    wins[:, idx[me]] += won
-                else:
-                    wins[:, idx[me]] += rng.random(N_SIMS) < p_fcs
-
-    sim = []
-    for t in teams:
-        i = idx[t]
-        w = wins[:, i]
-        cw = cwins[:, i]
-        dist = np.bincount(w.astype(int), minlength=14)[:14] / N_SIMS
-        sim.append({
-            "team": t,
-            "proj_wins": round(float(w.mean()), 2),
-            "proj_conf_wins": round(float(cw.mean()), 2),
-            "wins_p10": int(np.percentile(w, 10)),
-            "wins_p90": int(np.percentile(w, 90)),
-            "unrated_opponents": unrated[t],
-            "win_distribution": [round(float(x), 4) for x in dist],
-            "p_conf_leader": 0.0,
-        })
-    # share of sims in which each team has the outright-or-tied best conf record
-    best = cwins.max(axis=1, keepdims=True)
-    share = (cwins == best)
-    share = share / share.sum(axis=1, keepdims=True)
-    for s in sim:
-        s["p_conf_leader"] = round(float(share[:, idx[s["team"]]].mean()), 4)
+    sim = weekly.simulate(games, teams, N_SIMS)
+    weekly_history = weekly.history(games, teams, N_SIMS)
+    current = weekly_history[-1]
+    previous = weekly_history[-2] if len(weekly_history) > 1 else None
+    previous_teams = {t["team"]: t for t in previous["teams"]} if previous else {}
+    for team in sim:
+        old = previous_teams.get(team["team"])
+        team["change_proj_wins"] = round(team["proj_wins"] - old["proj_wins"], 4) if old else None
+        team["change_outlook_rank"] = old["outlook_rank"] - team["outlook_rank"] if old else None
+        team["change_conf_leader"] = round(team["p_conf_leader"] - old["p_conf_leader"], 4) if old else None
 
     simdf = pd.DataFrame(sim)
     sec = sec.merge(simdf, on="team", how="left")
@@ -186,6 +125,13 @@ def build(season=2026, conference="SEC"):
         "generated_at": datetime.now(timezone.utc).isoformat(),
         "snapshot_type": "live" if any(g["played"] for g in games)
                          else "preseason",
+        "data_source": source_info,
+        "completed_games": sum(g["played"] for g in games),
+        "current_period": current["label"],
+        "comparison_period": previous["label"] if previous else None,
+        "weekly_history": weekly_history,
+        "history_method": "Reconstructed from fixed preseason ratings and each week's final results; future results are excluded.",
+        "rating_basis": "Frozen preseason strength; results update records and season outlook, not strength ratings.",
         "generated_from": {
             "target": sel["target"],
             "winner": sel["winner"],
@@ -229,12 +175,21 @@ def build(season=2026, conference="SEC"):
         if o is not None and o != o:  # pandas NaT / NaN objects
             return None
         return o
-    path.write_text(json.dumps(clean(payload), allow_nan=False))
+    # A failed fetch/validation/simulation leaves the previous published data intact.
+    temporary = path.with_suffix(".tmp")
+    temporary.write_text(json.dumps(clean(payload), allow_nan=False))
+    temporary.replace(path)
     print("[export] %d teams, %d games, %d KB -> %s"
           % (len(sec), len(games), path.stat().st_size // 1024, path))
     return payload
 
 
 if __name__ == "__main__":
-    a = sys.argv[1:]
-    build(int(a[0]) if a else 2026, a[1] if len(a) > 1 else "SEC")
+    import argparse
+    parser = argparse.ArgumentParser(description=__doc__)
+    parser.add_argument("season", nargs="?", type=int, default=2026)
+    parser.add_argument("conference", nargs="?", default="SEC")
+    parser.add_argument("--source", choices=("auto", "cfbd", "espn"), default="auto")
+    parser.add_argument("--refresh", action="store_true")
+    args = parser.parse_args()
+    build(args.season, args.conference, args.source, args.refresh)

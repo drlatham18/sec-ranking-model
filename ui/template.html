@@ -283,12 +283,14 @@ footer{border-top:1px solid var(--line); padding:26px 0 60px; color:var(--muted)
     </div>
     <nav role="tablist">
       <button role="tab" aria-selected="true" data-tab="rank">Ranking</button>
+      <button role="tab" aria-selected="false" data-tab="weekly">Week to week</button>
       <button role="tab" aria-selected="false" data-tab="team">Team Lens</button>
       <button role="tab" aria-selected="false" data-tab="lab">Matchup Lab</button>
       <button role="tab" aria-selected="false" data-tab="grid">Neutral Grid</button>
       <button role="tab" aria-selected="false" data-tab="sched">Schedule</button>
       <button role="tab" aria-selected="false" data-tab="model">Model Card</button>
       <span style="flex:1"></span>
+      <button id="sharePage" type="button" title="Copy a link to this view">Share</button>
       <button id="themeBtn" type="button" title="Toggle theme">Theme</button>
     </nav>
   </div>
@@ -325,6 +327,27 @@ footer{border-top:1px solid var(--line); padding:26px 0 60px; color:var(--muted)
         <span><span class="sw" style="background:var(--accent)"></span>projected rating (points per game vs. an average team)</span>
         <span>&ldquo;Best record&rdquo; = share of 20,000 simulated seasons with the top SEC record (ties shared)</span>
       </div>
+    </section>
+  </div>
+
+  <div class="panel" id="p-weekly" hidden>
+    <section>
+      <div class="sec-head">
+        <h2>Week to week</h2>
+        <span class="note" id="weeklyNote"></span>
+        <label class="f"><span class="eyebrow">Through</span><select id="weeklySelect"></select></label>
+      </div>
+      <p class="prose">Outlook rank orders SEC teams by projected total wins. Final results update records,
+        projected wins, and best-record odds. Strength ratings remain the preseason forecast.</p>
+      <div class="tablewrap">
+        <table id="weeklyTable">
+          <thead><tr><th>Team</th><th class="num">Record</th><th class="num">Outlook rank</th>
+            <th class="num">Movement</th><th class="num">Proj W&ndash;L</th>
+            <th class="num">Win change</th><th class="num">Best SEC record</th>
+            <th class="num">Odds change</th></tr></thead><tbody></tbody>
+        </table>
+      </div>
+      <p class="note" style="color:var(--muted);margin-top:16px" id="historyMethod"></p>
     </section>
   </div>
 
@@ -433,7 +456,7 @@ footer{border-top:1px solid var(--line); padding:26px 0 60px; color:var(--muted)
         <table id="schedTable">
           <thead><tr>
             <th class="num">Wk</th><th>Date</th><th>Matchup</th><th>Site</th>
-            <th class="num">Line</th><th class="num">Fav win %</th>
+            <th class="num">Preseason line</th><th class="num">Pregame fav %</th>
             <th style="width:150px">Probability</th><th>Result</th>
           </tr></thead><tbody></tbody>
         </table>
@@ -512,6 +535,7 @@ const $ = s => document.querySelector(s);
 const el = (t,c,h) => { const n=document.createElement(t); if(c)n.className=c; if(h!==undefined)n.innerHTML=h; return n; };
 const pct = v => (v*100).toFixed(1) + '%';
 const sign = v => (v>0?'+':'') + v.toFixed(1);
+const delta = (v, digits=2, suffix='') => v == null ? '—' : (v>0?'+':'')+v.toFixed(digits)+suffix;
 const css = n => getComputedStyle(document.documentElement).getPropertyValue(n).trim();
 const FEATURE_LABELS = {
   sp_overall_lag1:'Strength last season', sp_overall_lag3:'Strength three seasons back',
@@ -533,14 +557,16 @@ $('#chips').innerHTML = [
   ['vs baseline', '−'+gain.toFixed(1)+'%'],
   ['Inputs kept', G.n_features],
   ['Home field', C.home_field_advantage.toFixed(2)+' pts'],
-  ['Snapshot', D.snapshot_type],
+  ['Results through', D.current_period || D.snapshot_type],
 ].map(([k,v]) => `<div class="chip"><span class="k">${k}</span><span class="v">${v}</span></div>`).join('');
 $('#ftTrained').textContent = G.trained_through;
 $('#testSpan').textContent = V.holdout_seasons[0] + '–' + V.holdout_seasons[V.holdout_seasons.length-1];
 $('#nGames').textContent = C.n_games.toLocaleString();
 $('#labNote').textContent = `Any two of the ${D.all_ratings.length} rated FBS teams. Neutral field by default.`;
 const generated = new Date(D.generated_at);
-$('#freshness').textContent = `Updated ${generated.toLocaleString()} · ${D.snapshot_type} snapshot.`;
+const checked = new Date(D.data_source?.checked_at || D.generated_at);
+const stale = games.some(g=>!g.played) && Date.now()-checked.getTime() > 48*60*60*1000;
+$('#freshness').textContent = `Results checked ${checked.toLocaleString()} · ${(D.data_source?.provider || 'CFBD').toUpperCase()} · ${D.completed_games ?? games.filter(g=>g.played).length} finals. Refreshes every 6 hours, August–December. ${stale?'Results may be stale. ':''}Strength ratings are preseason.`;
 
 /* ---------------- tabs ---------------- */
 const tabs = [...document.querySelectorAll('nav button[data-tab]')];
@@ -555,6 +581,27 @@ function activateTab(name, updateUrl=true){
   }
 }
 tabs.forEach(b => b.addEventListener('click', () => activateTab(b.dataset.tab)));
+$('#sharePage').addEventListener('click',async()=>{
+  const u=new URL(location.href), active=tabs.find(b=>b.getAttribute('aria-selected')==='true')?.dataset.tab;
+  u.search='';
+  if(active && active!=='rank') u.searchParams.set('tab',active);
+  if(active==='rank' && $('#rankView').value!=='SEC') u.searchParams.set('view',$('#rankView').value);
+  if(active==='team') u.searchParams.set('team',$('#teamSelect').value);
+  if(active==='lab'){
+    u.searchParams.set('a',$('#selA').value);u.searchParams.set('b',$('#selB').value);u.searchParams.set('site',site);
+  }
+  if(active==='sched'){
+    if($('#fTeam').value) u.searchParams.set('team',$('#fTeam').value);
+    if($('#fWeek').value) u.searchParams.set('week',$('#fWeek').value);
+    if($('#fKind').value!=='all') u.searchParams.set('kind',$('#fKind').value);
+  }
+  if(active==='weekly' && Number($('#weeklySelect').value)!==snapshots.length-1){
+    u.searchParams.set('week',String(snapshots[Number($('#weeklySelect').value)].week));
+  }
+  history.replaceState(null,'',u);
+  try{await navigator.clipboard.writeText(u.href);$('#sharePage').textContent='Copied';}
+  catch(_){$('#sharePage').textContent='Copy address bar';}
+});
 $('#themeBtn').addEventListener('click', () => {
   const r = document.documentElement;
   const dark = window.matchMedia
@@ -594,8 +641,8 @@ function renderRanking(){
     <td class="num mono">${t.projected_rating.toFixed(1)}</td>
     <td><span class="bar"><i style="width:${(frac*100).toFixed(1)}%"></i></span></td>
     <td class="num mono" style="color:var(--muted)">${t.lo_95.toFixed(0)} – ${t.hi_95.toFixed(0)}</td>
-    <td class="num mono">${hasSeason?t.proj_wins.toFixed(1)+'–'+(12-t.proj_wins).toFixed(1):'—'}</td>
-    <td class="num mono">${hasSeason?t.proj_conf_wins.toFixed(1)+'–'+(8-t.proj_conf_wins).toFixed(1):'—'}</td>
+    <td class="num mono">${hasSeason?t.proj_wins.toFixed(1)+'–'+((t.scheduled_games??12)-t.proj_wins).toFixed(1):'—'}${hasSeason&&t.wins!=null?`<br><small style="color:var(--muted)">${t.wins}–${t.losses} actual · ${delta(t.change_proj_wins)} wins</small>`:''}</td>
+    <td class="num mono">${hasSeason?t.proj_conf_wins.toFixed(1)+'–'+((t.scheduled_conf_games??9)-t.proj_conf_wins).toFixed(1):'—'}</td>
     <td class="num">${hasSeason?`<span class="pill ${cls}">${pct(t.p_conf_leader)}</span>`:'—'}</td>
     <td>${hasSeason?spark(t.win_distribution):'—'}</td>
     <td class="num mono" style="color:var(--muted)">${t.national_rank}</td>`;
@@ -605,7 +652,44 @@ function renderRanking(){
   });
 }
 $('#rankView').addEventListener('change',renderRanking);
+const requestedView=new URL(location.href).searchParams.get('view');
+if(['SEC','top25','all'].includes(requestedView)) $('#rankView').value=requestedView;
 renderRanking();
+
+/* ---------------- weekly comparisons ---------------- */
+const snapshots = D.weekly_history || [];
+$('#weeklySelect').innerHTML = snapshots.map((s,i)=>`<option value="${i}">${s.label}</option>`).join('');
+$('#weeklySelect').value = String(snapshots.length-1);
+const requestedWeek = new URL(location.href).searchParams.get('week');
+if(new URL(location.href).searchParams.get('tab')==='weekly' && requestedWeek!=null){
+  const found=snapshots.findIndex(s=>String(s.week)===requestedWeek);
+  if(found>=0) $('#weeklySelect').value=String(found);
+}
+$('#historyMethod').textContent = D.history_method || 'Weekly history will appear after the next results refresh.';
+function renderWeekly(){
+  const i=Number($('#weeklySelect').value), current=snapshots[i], previous=snapshots[i-1];
+  if(!current) return;
+  const old=Object.fromEntries((previous?.teams||[]).map(t=>[t.team,t]));
+  $('#weeklyNote').textContent = previous ? `${current.label} vs ${previous.label}${current.complete?'':' · week still in progress'}` : 'Preseason baseline';
+  $('#weeklyTable tbody').innerHTML = [...current.teams].sort((a,b)=>a.outlook_rank-b.outlook_rank||a.team.localeCompare(b.team)).map(t=>{
+    const p=old[t.team], movement=p?p.outlook_rank-t.outlook_rank:null;
+    const move=movement==null?'—':movement>0?'↑ '+movement:movement<0?'↓ '+Math.abs(movement):'—';
+    return `<tr><td class="team">${t.team}</td><td class="num mono">${t.wins}–${t.losses}</td>
+      <td class="num mono">${t.outlook_rank}</td><td class="num mono" style="color:${movement>0?'var(--good)':movement<0?'var(--bad)':'var(--muted)'}">${move}</td>
+      <td class="num mono">${t.proj_wins.toFixed(1)}–${(t.scheduled_games-t.proj_wins).toFixed(1)}</td>
+      <td class="num mono">${delta(p?t.proj_wins-p.proj_wins:null)}</td>
+      <td class="num mono">${pct(t.p_conf_leader)}</td>
+      <td class="num mono">${delta(p?(t.p_conf_leader-p.p_conf_leader)*100:null,2,' pp')}</td></tr>`;
+  }).join('');
+}
+$('#weeklySelect').addEventListener('change',()=>{
+  renderWeekly();
+  const i=Number($('#weeklySelect').value), u=new URL(location.href);
+  if(i===snapshots.length-1) u.searchParams.delete('week');
+  else u.searchParams.set('week',String(snapshots[i].week));
+  history.replaceState(null,'',u);
+});
+renderWeekly();
 
 /* ---------------- matchup lab ---------------- */
 const all = D.all_ratings.slice().sort((a,b) => a.team.localeCompare(b.team));
@@ -617,6 +701,9 @@ function fill(sel, def){
 }
 fill($('#selA'), teams[0].team);
 fill($('#selB'), teams[1].team);
+const labParams=new URL(location.href).searchParams;
+if(all.some(t=>t.team===labParams.get('a'))) $('#selA').value=labParams.get('a');
+if(all.some(t=>t.team===labParams.get('b'))) $('#selB').value=labParams.get('b');
 fill($('#teamSelect'), new URL(location.href).searchParams.get('team') || teams[0].team);
 
 function renderTeam(){
@@ -636,6 +723,8 @@ function renderTeam(){
     ['68% interval', `${t.lo_68.toFixed(1)} to ${t.hi_68.toFixed(1)}`],
     ['95% interval', `${t.lo_95.toFixed(1)} to ${t.hi_95.toFixed(1)}`],
     ['Projected wins', t.proj_wins!=null?t.proj_wins.toFixed(1):'SEC schedule model only'],
+    ['Current record', t.wins!=null?`${t.wins}–${t.losses}`:'—'],
+    ['Change vs '+(D.comparison_period||'previous week'), delta(t.change_proj_wins)+' projected wins'],
   ].map(([k,v])=>`<dt>${k}</dt><dd>${v}</dd>`).join('');
   const max=Math.max(...ex.drivers.map(d=>Math.abs(d.points)),.01);
   $('#driverList').innerHTML=ex.drivers.map(d=>{
@@ -649,7 +738,7 @@ function renderTeam(){
     const home=g.home===name,opp=home?g.away:g.home,p=home?g.p_home:1-g.p_home;
     return `<div class="driverrow"><span><strong>${opp}</strong><br><small style="color:var(--muted)">Week ${g.week} · ${g.neutral?'neutral':home?'home':'away'}</small></span>
       <span class="bar"><i style="width:${(p*100).toFixed(1)}%;background:${p>=.5?'var(--good)':'var(--bad)'}"></i></span>
-      <span class="mono" style="text-align:right">${(p*100).toFixed(0)}%</span></div>`;
+      <span class="mono" style="text-align:right">${g.played?`Final<br>${home?g.home_points:g.away_points}–${home?g.away_points:g.home_points}`:`${(p*100).toFixed(0)}%`}</span></div>`;
   }).join('') || '<p class="note">No rated-opponent schedule is available.</p>';
   const u=new URL(location.href);u.searchParams.set('team',name);
   if(u.searchParams.get('tab')==='team')history.replaceState(null,'',u);
@@ -662,6 +751,8 @@ $('#shareTeam').addEventListener('click',async()=>{
 });
 renderTeam();
 let site = 'neutral';
+if(['a','b','neutral'].includes(labParams.get('site'))) site=labParams.get('site');
+[...$('#siteBar').children].forEach(x=>x.setAttribute('aria-pressed',String(x.dataset.site===site)));
 $('#siteBar').addEventListener('click', e => {
   const b = e.target.closest('button'); if(!b) return;
   site = b.dataset.site;
@@ -794,11 +885,17 @@ paintGrid();
 /* ---------------- schedule ---------------- */
 const secSet = new Set(teams.map(t => t.team));
 $('#schedNote').textContent =
-  `${games.length} games involving an SEC team against a rated FBS opponent · FCS games excluded`;
+  `${games.length} SEC games · FCS opponents included · ${games.filter(g=>g.played).length} final results`;
 $('#fTeam').innerHTML = '<option value="">All SEC teams</option>' +
   teams.map(t => `<option>${t.team}</option>`).join('');
-const weeks = [...new Set(games.map(g => g.week).filter(w => w))].sort((a,b)=>a-b);
+const weeks = [...new Set(games.map(g => g.week).filter(w => w != null))].sort((a,b)=>a-b);
 $('#fWeek').innerHTML = '<option value="">All weeks</option>' + weeks.map(w => `<option>${w}</option>`).join('');
+const scheduleParams=new URL(location.href).searchParams;
+if(scheduleParams.get('tab')==='sched'){
+  if(teams.some(t=>t.team===scheduleParams.get('team'))) $('#fTeam').value=scheduleParams.get('team');
+  if(weeks.some(w=>String(w)===scheduleParams.get('week'))) $('#fWeek').value=scheduleParams.get('week');
+  if(['all','conf','close'].includes(scheduleParams.get('kind'))) $('#fKind').value=scheduleParams.get('kind');
+}
 function renderSched(){
   const t = $('#fTeam').value, w = $('#fWeek').value, k = $('#fKind').value;
   const rows = games.filter(g =>
@@ -813,13 +910,13 @@ function renderSched(){
     const pa = (g.p_home*100);
     const tr = el('tr','gamerow');
     const siteTxt = g.neutral ? 'Neutral' : g.home + ' · home';
-    const result = g.played ? `${g.home_points}–${g.away_points}` : '<span style="color:var(--muted)">—</span>';
+    const result = g.played ? `Final · ${g.away} ${g.away_points}, ${g.home} ${g.home_points}` : '<span style="color:var(--muted)">—</span>';
     tr.innerHTML = `
       <td class="num mono">${g.week ?? ''}</td>
       <td class="mono" style="color:var(--muted)">${g.date ?? ''}</td>
       <td><strong>${g.away}</strong> at <strong>${g.home}</strong>${g.conf_game?' <span class="pill lo">SEC</span>':''}</td>
       <td style="color:var(--muted)">${siteTxt}</td>
-      <td class="num mono">${fav} −${Math.abs(g.margin_home).toFixed(1)}</td>
+      <td class="num mono">${g.margin_home==null?'Unrated opponent':fav+' −'+Math.abs(g.margin_home).toFixed(1)}</td>
       <td class="num mono">${(p*100).toFixed(0)}%</td>
       <td><span class="bar" title="${g.home} ${pa.toFixed(0)}%"><i style="width:${pa.toFixed(1)}%;background:${pa>=50?'var(--good)':'var(--bad)'}"></i></span></td>
       <td class="mono">${result}</td>`;

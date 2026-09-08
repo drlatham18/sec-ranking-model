@@ -1,0 +1,104 @@
+{
+  "events": [
+    {
+      "id": "401856663",
+      "season": {
+        "year": 2026,
+        "type": 2,
+        "slug": "regular-season"
+      },
+      "week": {
+        "number": 1
+      },
+      "date": "2026-09-04T00:00Z",
+      "status": {
+        "clock": 0.0,
+        "displayClock": "0:00",
+        "period": 4,
+        "type": {
+          "id": "3",
+          "name": "STATUS_FINAL",
+          "state": "post",
+          "completed": true,
+          "description": "Final",
+          "detail": "Final",
+          "shortDetail": "Final"
+        }
+      },
+      "competitions": [
+        {
+          "neutralSite": false,
+          "conferenceCompetition": false,
+          "competitors": [
+            {
+              "homeAway": "home",
+              "score": "54",
+              "team": {
+                "location": "Missouri",
+                "conferenceId": "8"
+              }
+            },
+            {
+              "homeAway": "away",
+              "score": "14",
+              "team": {
+                "location": "Arkansas-Pine Bluff",
+                "conferenceId": "31"
+              }
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "id": "401856664",
+      "season": {
+        "year": 2026,
+        "type": 2,
+        "slug": "regular-season"
+      },
+      "week": {
+        "number": 1
+      },
+      "date": "2026-09-05T00:00Z",
+      "status": {
+        "clock": 0.0,
+        "displayClock": "0:00",
+        "period": 4,
+        "type": {
+          "id": "3",
+          "name": "STATUS_FINAL",
+          "state": "post",
+          "completed": true,
+          "description": "Final",
+          "detail": "Final",
+          "shortDetail": "Final"
+        }
+      },
+      "competitions": [
+        {
+          "neutralSite": false,
+          "conferenceCompetition": false,
+          "competitors": [
+            {
+              "homeAway": "home",
+              "score": "51",
+              "team": {
+                "location": "Oklahoma",
+                "conferenceId": "8"
+              }
+            },
+            {
+              "homeAway": "away",
+              "score": "0",
+              "team": {
+                "location": "UTEP",
+                "conferenceId": "17"
+              }
+            }
+          ]
+        }
+      ]
+    }
+  ]
+}
