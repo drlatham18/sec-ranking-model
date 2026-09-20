@@ -190,9 +190,20 @@ GitHub Pages now fetches results and checks integrity before every push/manual
 deployment. A failed refresh leaves the previously deployed site available.
 The page shows the source, check time, final-game count, and a stale-results
 notice after 48 hours. GitHub Actions refreshes results every six hours during
-August–December (00:17, 06:17, 12:17, and 18:17 UTC; GitHub may delay queued
-runs). Model fitting stays on Body 1. To manually refresh without a code change,
+August–December (00:17, 06:17, 12:17, and 18:17 UTC), plus dedicated Sunday and
+Thursday morning runs (11:20 UTC, ~07:20 ET) so the post-weekend and
+pre-Thursday-night refreshes still happen when GitHub delays or drops a queued
+run. Model fitting stays on Body 1. To manually refresh without a code change,
 run **Deploy GitHub Pages** from the repository's Actions tab.
+
+A scheduled refresh that fails opens (or comments on) a `refresh-failure` issue
+instead of going unnoticed: the deployed site keeps serving its last good data,
+so a broken feed shows up only as scores that stop advancing.
+
+The ESPN adapter pulls one regular-season week at a time. ESPN no longer serves
+multi-day `dates=A-B` ranges on the scoreboard endpoint — a range answers HTTP
+400 — which silently stopped every scheduled refresh until it was replaced with
+per-week requests.
 
 Stable public links always open the latest deployed data:
 
