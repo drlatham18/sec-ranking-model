@@ -16,6 +16,7 @@ sys.path.insert(0, str(pathlib.Path(__file__).resolve().parent))
 import build_dataset as BD
 import schedule_data
 import weekly
+import inseason
 
 ROOT = pathlib.Path(__file__).resolve().parents[1]
 OUT = ROOT / "output"
@@ -56,6 +57,26 @@ def build(season=2026, conference="SEC", source="auto", refresh=False):
     schedule_data.validate_schedule(sched, sec_teams)
     p_fcs, n_fcs = fcs_win_rate()
 
+    # --- current (in-season) strength ------------------------------------
+    # Frozen preseason ratings stay the basis of the weekly comparison, which
+    # must not be rewritten by later results. Forward-looking probabilities use
+    # strength that includes the season actually being played.
+    played = sched[sched.completed]
+    through_week = int(played.week.max()) if len(played) else 0
+    strength = None
+    try:
+        cal_in = inseason.load_calibration()
+        if through_week:
+            fbs = schedule_data.fbs_results(season, through_week, source, refresh)
+            results = [{"home": r.home_team, "away": r.away_team,
+                        "home_points": r.home_points, "away_points": r.away_points,
+                        "neutral": bool(r.neutral)} for _, r in fbs.iterrows()]
+            strength = inseason.current_ratings(results, rmap, cal_in)
+    except (FileNotFoundError, ValueError) as error:
+        print("[export] in-season blend unavailable (%s); preseason only" % error)
+        cal_in = None
+    cmap = {t: v["blended"] for t, v in strength.items()} if strength else {}
+
     game_sd_n = cal["neutral_residual_sd"]
     game_sd_h = cal["residual_sd"]
     b1 = cal["rating_diff_coef"]
@@ -72,6 +93,17 @@ def build(season=2026, conference="SEC", source="auto", refresh=False):
                   cal["intercept"] + b1 * (rh - ra) + cal["home_field_advantage"] * hf)
         sd = float(np.sqrt((game_sd_n if r.neutral else game_sd_h) ** 2 + extra))
         p_home = (p_fcs if rh is not None else 1 - p_fcs) if unrated else float(norm.cdf(margin / sd))
+        # Current-strength view of the same game (None until the blend exists).
+        ch, ca = cmap.get(r.home_team), cmap.get(r.away_team)
+        if cal_in and ch is not None and ca is not None:
+            m_cur = cal_in["rating_diff_coef"] * (ch - ca) + cal_in["home_field_advantage"] * hf
+            sd_cur = cal_in["residual_sd"]
+            p_cur = float(norm.cdf(m_cur / sd_cur))
+        else:
+            m_cur = sd_cur = None
+            p_cur = p_home if unrated else None
+        playable_at = (cal_in or {}).get("playable_threshold")
+        confidence = max(p_cur, 1 - p_cur) if p_cur is not None else None
         games.append({
             "id": str(r.id),
             "week": int(r.week) if pd.notna(r.week) else None,
@@ -82,6 +114,14 @@ def build(season=2026, conference="SEC", source="auto", refresh=False):
             "home_rating": round(rh, 2) if rh is not None else None,
             "away_rating": round(ra, 2) if ra is not None else None,
             "margin_home": round(margin, 2) if margin is not None else None,
+            "margin_home_current": round(m_cur, 2) if m_cur is not None else None,
+            "p_home_current": round(p_cur, 4) if p_cur is not None else None,
+            "sd_current": round(sd_cur, 2) if sd_cur is not None else None,
+            "confidence_current": round(confidence, 4) if confidence is not None else None,
+            # Validated tier: holdout accuracy at/above this confidence clears
+            # the target with its 95% lower bound, not just its point estimate.
+            "playable": (None if confidence is None or playable_at is None
+                         else bool(confidence >= playable_at)),
             "unrated": unrated, "p_home": round(p_home, 4),
             "sd": round(sd, 2),
             "played": bool(r.completed),
@@ -114,6 +154,20 @@ def build(season=2026, conference="SEC", source="auto", refresh=False):
             (cal["intercept"] + b1 * (rmap[a] - rmap[b]))
             / float(np.sqrt(game_sd_n ** 2 + extra)))), 4)
             for b in teams if b != a}
+
+    if strength:
+        ratings = ratings.assign(
+            current_rating=ratings.team.map(
+                lambda t: round(strength[t]["blended"], 2) if t in strength else None),
+            games_rated=ratings.team.map(lambda t: strength.get(t, {}).get("n_games")),
+            blend_weight=ratings.team.map(lambda t: strength.get(t, {}).get("weight")))
+        sec = sec.merge(ratings[["team", "current_rating", "games_rated",
+                                 "blend_weight"]], on="team", how="left")
+        current_grid = {a: {b: round(float(norm.cdf(
+            (cal_in["rating_diff_coef"] * (cmap[a] - cmap[b]))
+            / cal_in["residual_sd"])), 4) for b in teams if b != a} for a in teams}
+    else:
+        current_grid = None
 
     oos = pd.read_csv(OUT / "oos_predictions.csv")
     explanation_path = OUT / ("explanations_%d.json" % season)
@@ -156,6 +210,10 @@ def build(season=2026, conference="SEC", source="auto", refresh=False):
         "all_ratings": ratings.round(2).to_dict("records"),
         "games": games,
         "neutral_grid": grid,
+        "current_grid": current_grid,
+        "inseason": ({"calibration": cal_in,
+                      "through_week": through_week,
+                      "rated_teams": len(cmap)} if strength else None),
         "explanations": explanations,
         "oos_scatter": oos[oos.season >= sel["test_seasons"][0]]
             .round(2).to_dict("records"),

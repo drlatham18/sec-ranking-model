@@ -13,32 +13,38 @@ import build_dataset
 import build_ui
 import export_data
 import fit
+import fit_inseason
 import rank
 
 
 def main(start=2004, end=2026):
     print("=" * 70)
-    print("STEP 1/5  build panel  (%d-%d)" % (start, end))
+    print("STEP 1/6  build panel  (%d-%d)" % (start, end))
     print("=" * 70)
     build_dataset.build(start, end)
 
     print("\n" + "=" * 70)
-    print("STEP 2/5  feature selection + untouched holdout validation")
+    print("STEP 2/6  feature selection + untouched holdout validation")
     print("=" * 70)
     fit.run(2014)
 
     print("\n" + "=" * 70)
-    print("STEP 3/5  ranking + explanations")
+    print("STEP 3/6  ranking + explanations")
     print("=" * 70)
     rank.project(end, "SEC")
 
     print("\n" + "=" * 70)
-    print("STEP 4/5  schedule + season simulation")
+    print("STEP 4/6  in-season blend: fit K, validate against the preseason baseline")
+    print("=" * 70)
+    fit_inseason.main()
+
+    print("\n" + "=" * 70)
+    print("STEP 5/6  schedule + season simulation")
     print("=" * 70)
     export_data.build(end, "SEC")
 
     print("\n" + "=" * 70)
-    print("STEP 5/5  product UI")
+    print("STEP 6/6  product UI")
     print("=" * 70)
     build_ui.build()
 

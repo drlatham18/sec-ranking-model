@@ -5,14 +5,19 @@ on:
     branches: [main]
   workflow_dispatch:
   schedule:
-    # Lightweight results refresh every six hours during the football season.
-    # Full model fitting stays on Body 1.
-    - cron: '17 */6 * 8-12 *'
+    # Results and in-season ratings refresh every day, year round, so the site
+    # is never more than 24h stale even out of season. During the season the
+    # six-hourly run picks up Saturday finals the same night. Model FITTING
+    # (the preseason regression) still stays on Body 1; these runs only refresh
+    # results and recompute the in-season blend from them.
+    - cron: '20 11 * * *'        # daily ~07:20 ET, all year
+    - cron: '17 */6 * 8-12 *'    # every six hours, Aug-Dec
 
 permissions:
   contents: read
   pages: write
   id-token: write
+  issues: write
 
 concurrency:
   group: pages
@@ -53,3 +58,34 @@ jobs:
       - name: Deploy
         id: deployment
         uses: actions/deploy-pages@v4
+
+      # A failed scheduled refresh is otherwise invisible: the previously
+      # deployed site stays up and simply goes stale. Raise it where it will be
+      # noticed instead of waiting for someone to spot old scores.
+      - name: Report a broken refresh
+        if: failure() && github.event_name == 'schedule'
+        uses: actions/github-script@v7
+        with:
+          script: |
+            const title = 'Scheduled results refresh is failing';
+            const body = [
+              `The scheduled Pages refresh failed on ${new Date().toISOString()}.`,
+              '',
+              `Run: ${context.serverUrl}/${context.repo.owner}/${context.repo.repo}/actions/runs/${context.runId}`,
+              '',
+              'The published site keeps serving the last good data and shows its',
+              'stale-results notice, so nothing is broken for visitors -- but the',
+              'scores stop advancing until this is fixed.',
+            ].join('\n');
+            const open = await github.rest.issues.listForRepo({
+              ...context.repo, state: 'open', labels: 'refresh-failure', per_page: 1,
+            });
+            if (open.data.length) {
+              await github.rest.issues.createComment({
+                ...context.repo, issue_number: open.data[0].number, body,
+              });
+            } else {
+              await github.rest.issues.create({
+                ...context.repo, title, body, labels: ['refresh-failure'],
+              });
+            }

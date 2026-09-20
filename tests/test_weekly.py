@@ -20,6 +20,22 @@ def game(home="A", away="B", week=1, p=.7, played=False, hp=None, ap=None, conf=
                 home_points=hp, away_points=ap, conf_game=conf, unrated=False)
 
 
+class FakeResponse:
+    """Minimal stand-in for requests.Response."""
+
+    def __init__(self, payload, status=200):
+        self._payload = payload
+        self.status_code = status
+        self.url = "https://site.api.espn.com/scoreboard"
+
+    def raise_for_status(self):
+        if self.status_code >= 400:
+            raise schedule_data.requests.HTTPError("%d" % self.status_code)
+
+    def json(self):
+        return self._payload
+
+
 class WeeklyResultsTests(unittest.TestCase):
     def test_only_explicit_finals_lock_scores(self):
         payload = json.loads((ROOT / "tests/fixtures/espn_week1.json").read_text())
@@ -44,6 +60,59 @@ class WeeklyResultsTests(unittest.TestCase):
         self.assertIsNone(frame.iloc[0].home_points)
         self.assertTrue(fetch.call_args.kwargs["refresh"])
         self.assertTrue(fetch.call_args.kwargs["_required"])
+
+    def test_espn_pulls_each_week_and_never_sends_a_date_range(self):
+        """ESPN answers 400 to `dates=A-B`; a range silently stopped all refreshes."""
+        calls = []
+
+        def fake_get(url, params=None, timeout=None):
+            calls.append(params)
+            week = params["week"]
+            return FakeResponse({"events": [{
+                "id": "g%d" % week, "date": "2026-09-05T16:00Z",
+                "season": {"year": 2026, "type": 2}, "week": {"number": week},
+                "status": {"type": {"completed": False, "state": "pre"}},
+                "competitions": [{"neutralSite": False, "conferenceCompetition": True,
+                                  "competitors": [
+                                      {"homeAway": "home", "score": "0",
+                                       "team": {"location": "A", "conferenceId": "8"}},
+                                      {"homeAway": "away", "score": "0",
+                                       "team": {"location": "B", "conferenceId": "8"}}]}],
+            }]})
+
+        with patch.object(schedule_data.requests, "get", side_effect=fake_get):
+            frame, metadata = schedule_data.fetch_schedule(2026, "espn")
+        self.assertEqual(len(calls), len(schedule_data.ESPN_WEEKS))
+        for params in calls:
+            self.assertEqual(params["dates"], 2026)
+            self.assertEqual(params["seasontype"], 2)
+            self.assertNotIn("-", str(params["dates"]))
+        self.assertEqual(sorted(frame.week), list(schedule_data.ESPN_WEEKS))
+        self.assertEqual(metadata["provider"], "espn")
+        self.assertTrue(metadata["cache_bypassed"])
+
+    def test_espn_retries_then_fails_loudly_rather_than_publishing_part(self):
+        attempts = []
+
+        def flaky(url, params=None, timeout=None):
+            attempts.append(params["week"])
+            if params["week"] == 2 and attempts.count(2) == 1:
+                return FakeResponse({}, status=500)
+            return FakeResponse({"events": []})
+
+        with patch.object(schedule_data.requests, "get", side_effect=flaky), \
+                patch.object(schedule_data.time, "sleep"):
+            with self.assertRaises(ValueError):  # empty schedule, not a 500
+                schedule_data.fetch_schedule(2026, "espn")
+        self.assertEqual(attempts.count(2), 2)  # retried once, then succeeded
+
+        def broken(url, params=None, timeout=None):
+            return FakeResponse({}, status=400)
+
+        with patch.object(schedule_data.requests, "get", side_effect=broken), \
+                patch.object(schedule_data.time, "sleep"):
+            with self.assertRaises(RuntimeError):
+                schedule_data.fetch_schedule(2026, "espn")
 
     def test_weekly_deltas_use_finals_without_future_results(self):
         games = [game(played=True, hp=7, ap=10),

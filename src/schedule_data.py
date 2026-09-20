@@ -6,6 +6,7 @@ ESPN's public scoreboard provides a keyless SEC schedule/results fallback.
 from datetime import datetime, timezone
 import pathlib
 import os
+import time
 
 import pandas as pd
 import requests
@@ -13,6 +14,15 @@ import requests
 import build_dataset as BD
 
 ESPN_URL = "https://site.api.espn.com/apis/site/v2/sports/football/college-football/scoreboard"
+# ESPN stopped serving multi-day `dates=A-B` ranges on this endpoint; any range
+# now answers 400. Single dates and explicit season/week selectors still work,
+# so the regular season is pulled one week at a time and merged.
+ESPN_WEEKS = range(1, 17)
+ESPN_ATTEMPTS = 3
+# ESPN caps a scoreboard response at 25 events regardless of `limit`, so an
+# all-FBS pull must be split. Asking per conference keeps every response well
+# under the cap; games between two conferences arrive twice and are deduped.
+ESPN_FBS_GROUPS = (1, 4, 5, 8, 9, 12, 15, 17, 18, 20, 151)
 
 
 def espn_rows(payload, season):
@@ -45,6 +55,59 @@ def espn_rows(payload, season):
     return rows
 
 
+def espn_get(season, week, group=8):
+    """One week of the scoreboard, retried briefly for transient failures.
+
+    A full pull is 16 requests, so a single flaky response must not discard an
+    otherwise healthy refresh. A persistent error still raises: publishing a
+    partial schedule would silently drop games.
+    """
+    last = None
+    for attempt in range(ESPN_ATTEMPTS):
+        try:
+            response = requests.get(ESPN_URL, params={
+                "dates": season, "seasontype": 2, "week": week,
+                "groups": group, "limit": 1000,
+            }, timeout=45)
+            response.raise_for_status()
+            return response.json()
+        except (requests.RequestException, ValueError) as error:
+            last = error
+            if attempt + 1 < ESPN_ATTEMPTS:
+                time.sleep(2 ** attempt)
+    raise RuntimeError(
+        f"ESPN week {week} (group {group}) of {season} failed: {last}") from last
+
+
+def espn_week_rows(season, groups=(8,), weeks=ESPN_WEEKS):
+    """Merge the requested conference groups and weeks into one schedule."""
+    rows = []
+    for group in groups:
+        for week in weeks:
+            rows.extend(espn_rows(espn_get(season, week, group), season))
+    return rows
+
+
+def fbs_results(season, through_week, source="auto", refresh=False):
+    """Every completed FBS game through `through_week`.
+
+    In-season strength needs the whole FBS, not just one conference: a team's
+    rating is only as good as the opponents it is measured against.
+    """
+    if source == "auto":
+        source = "cfbd" if (os.environ.get("CFBD_API_KEY") or
+                            (pathlib.Path.home() / ".cfbd_key").exists()) else "espn"
+    if source == "cfbd":
+        frame, _ = fetch_schedule(season, "cfbd", refresh)
+    else:
+        weeks = range(1, max(1, int(through_week)) + 1)
+        rows = espn_week_rows(season, ESPN_FBS_GROUPS, weeks)
+        if not rows:
+            raise ValueError(f"espn returned no {season} results through week {through_week}")
+        frame = pd.DataFrame(rows).drop_duplicates("id")
+    return frame[frame.completed].copy()
+
+
 def fetch_schedule(season, source="auto", refresh=False):
     if source == "auto":
         source = "cfbd" if (os.environ.get("CFBD_API_KEY") or
@@ -69,12 +132,9 @@ def fetch_schedule(season, source="auto", refresh=False):
             })
         url = "https://api.collegefootballdata.com/games"
     elif source == "espn":
-        response = requests.get(ESPN_URL, params={
-            "dates": f"{season}0801-{season}1210", "groups": 8, "limit": 1000,
-        }, timeout=45)
-        response.raise_for_status()
-        rows = espn_rows(response.json(), season)
-        url = response.url
+        rows = espn_week_rows(season)
+        url = (f"{ESPN_URL}?dates={season}&seasontype=2"
+               f"&week=1-{ESPN_WEEKS[-1]}&groups=8&limit=1000")
     else:
         raise ValueError(f"Unknown schedule source: {source}")
     if not rows:
