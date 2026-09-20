@@ -90,6 +90,12 @@ nav button:focus-visible{outline:2px solid var(--accent); outline-offset:-4px}
   text-transform:uppercase; letter-spacing:.1em; font-size:.75rem;
 }
 
+/* ---------- from-results meter ---------- */
+.meter{display:inline-block;width:72px;height:7px;border-radius:4px;
+  background:var(--line,#ddd);overflow:hidden;vertical-align:middle}
+.meter-fill{display:block;height:100%;background:var(--accent);border-radius:4px}
+.meter-label{margin-left:8px;font-variant-numeric:tabular-nums}
+
 /* ---------- panels ---------- */
 main{padding:34px 0 80px}
 .panel[hidden]{display:none}
@@ -283,7 +289,7 @@ footer{border-top:1px solid var(--line); padding:26px 0 60px; color:var(--muted)
     </div>
     <nav role="tablist">
       <button role="tab" aria-selected="true" data-tab="rank">Ranking</button>
-      <button role="tab" aria-selected="false" data-tab="top25">Top 25 vs AP</button>
+      <button role="tab" aria-selected="false" data-tab="top25">Top 25</button>
       <button role="tab" aria-selected="false" data-tab="weekly">Week to week</button>
       <button role="tab" aria-selected="false" data-tab="team">Team Lens</button>
       <button role="tab" aria-selected="false" data-tab="lab">Matchup Lab</button>
@@ -334,33 +340,36 @@ footer{border-top:1px solid var(--line); padding:26px 0 60px; color:var(--muted)
   <div class="panel" id="p-top25" hidden>
     <section>
       <div class="sec-head">
-        <h2>Our Top 25 vs the AP poll</h2>
+        <h2>Model Top 25</h2>
         <span class="note" id="t25Note"></span>
         <div class="rank-tools">
-          <label class="f"><span class="eyebrow">Compare</span><select id="t25Mode">
-            <option value="same_information">Like for like</option>
-            <option value="as_published">Our latest vs AP</option>
+          <label class="f"><span class="eyebrow">Show</span><select id="t25Depth">
+            <option value="25">Top 25</option><option value="50">Top 50</option>
+            <option value="0">All 138</option></select></label>
+          <label class="f"><span class="eyebrow">Movement</span><select id="t25Move">
+            <option value="change_since_last_week">Since last week</option>
+            <option value="change_since_preseason">Since preseason</option>
           </select></label>
         </div>
       </div>
-      <p class="note" id="t25Explain"></p>
+      <p class="note">Ordered by rating &mdash; points per game against an average opponent.
+        No votes, no ballots, no reputation term. &ldquo;From results&rdquo; is how much of a
+        rating comes from this season rather than the preseason projection; it rises as
+        a team plays more games.</p>
       <div class="tablewrap">
         <table id="t25Table">
           <thead><tr>
-            <th>#</th><th>Team</th><th class="num">Rating</th>
-            <th class="num">AP</th><th class="num">Diff</th><th style="width:180px">Who likes them more</th>
+            <th>#</th><th>Move</th><th>Team</th><th>Conf</th>
+            <th class="num">Rating</th><th class="num">Record</th>
+            <th class="num">Preseason</th><th style="width:140px">From results</th>
           </tr></thead>
           <tbody></tbody>
         </table>
       </div>
-      <div class="sec-head" style="margin-top:18px"><h3>Where we part ways</h3></div>
-      <div class="tablewrap">
-        <table id="t25Diff"><thead><tr><th>Disagreement</th><th>Teams</th></tr></thead><tbody></tbody></table>
-      </div>
       <div class="legend">
-        <span><span class="sw" style="background:var(--accent)"></span>we rank them higher than AP</span>
-        <span><span class="sw" style="background:var(--muted)"></span>AP ranks them higher</span>
-        <span>A rating estimates points vs. an average opponent; a poll is voters weighing record and reputation. They are not the same measurement, and are not expected to agree.</span>
+        <span><span class="sw" style="background:var(--accent)"></span>risen</span>
+        <span><span class="sw" style="background:var(--muted)"></span>fallen</span>
+        <span>Rating is frozen-preseason strength shrunk toward opponent-adjusted results to date.</span>
       </div>
     </section>
   </div>
@@ -726,45 +735,40 @@ $('#weeklySelect').addEventListener('change',()=>{
 });
 renderWeekly();
 
-/* ---------------- top 25 vs AP ---------------- */
-const PC = D.poll_comparison;
-if(!PC || !PC.polls || !PC.polls.ap){
+/* ---------------- model top 25 ---------------- */
+const NAT = D.national_ranking || D.top25 || [];
+if(!NAT.length){
   const b=document.querySelector('nav button[data-tab="top25"]'); if(b) b.remove();
   const pn=$('#p-top25'); if(pn) pn.remove();
 }else{
-  const apPoll = PC.polls.ap;
-  $('#t25Note').textContent = `${apPoll.headline||'AP Top 25'} \u00b7 voted on games through week ${apPoll.information_through}`;
-  const t25b = $('#t25Table tbody'), t25d = $('#t25Diff tbody');
-  function renderT25(){
-    const mode = $('#t25Mode').value;
-    const cmp = PC.comparisons.ap[mode];
-    $('#t25Explain').textContent = mode === 'same_information'
-      ? `Our ranking recomputed using only the games the voters had seen (through week ${apPoll.information_through}), so neither side has an information advantage.`
-      : `Our current ranking, which already includes results the voters had not seen when this poll was published.`;
-    t25b.innerHTML = cmp.rows.map(r => {
-      const d = r.delta;
-      const tag = d === null ? '<span class="note">unranked by AP</span>'
-        : d > 0 ? `<span style="color:var(--accent)">we do, by ${d}</span>`
-        : d < 0 ? `<span class="note">AP does, by ${Math.abs(d)}</span>`
-        : '<span class="note">agree</span>';
-      return `<tr><td>${r.model_rank}</td><td>${r.team}</td>`
-        + `<td class="num">${r.rating.toFixed(2)}</td>`
-        + `<td class="num">${r.poll_rank ?? '&mdash;'}</td>`
-        + `<td class="num">${d === null ? '&mdash;' : (d>0?'+':'')+d}</td>`
-        + `<td>${tag}</td></tr>`;
-    }).join('');
-    const they = cmp.they_rank_we_do_not.map(x => `${x.team} (AP ${x.poll_rank})`).join(', ') || '&mdash;';
-    const we = cmp.we_rank_they_do_not.join(', ') || '&mdash;';
-    const big = cmp.biggest_disagreements.map(r =>
-      `${r.team} (us ${r.model_rank}, AP ${r.poll_rank})`).join(', ') || '&mdash;';
-    t25d.innerHTML = [
-      ['We rank them, AP does not', we],
-      ['AP ranks them, we do not', they],
-      ['Largest gaps among teams both rank', big],
-      ['Teams in both top 25s', `${cmp.overlap} of 25`],
-    ].map(([k,v]) => `<tr><td>${k}</td><td>${v}</td></tr>`).join('');
+  const confOf = Object.fromEntries(D.all_ratings.map(t => [t.team, t.conference]));
+  $('#t25Note').textContent = D.ranking_through_week
+    ? `through week ${D.ranking_through_week}` : 'preseason';
+  const body = $('#t25Table tbody');
+  function moveCell(v){
+    if(v === null || v === undefined) return '<span class="note">&mdash;</span>';
+    if(v === 0) return '<span class="note">&ndash;</span>';
+    return v > 0 ? `<span style="color:var(--accent)">&#9650;${v}</span>`
+                 : `<span class="note">&#9660;${Math.abs(v)}</span>`;
   }
-  $('#t25Mode').addEventListener('change', renderT25);
+  function renderT25(){
+    const depth = Number($('#t25Depth').value);
+    const key = $('#t25Move').value;
+    const rows = depth ? NAT.slice(0, depth) : NAT;
+    body.innerHTML = rows.map(r => {
+      const pct = Math.round(100 * (r.from_results || 0));
+      return `<tr><td>${r.rank}</td><td>${moveCell(r[key])}</td>`
+        + `<td>${r.team}</td><td class="note">${confOf[r.team] || ''}</td>`
+        + `<td class="num">${r.rating.toFixed(2)}</td>`
+        + `<td class="num">${r.record || '&mdash;'}</td>`
+        + `<td class="num note">${r.preseason_rank ?? '&mdash;'}</td>`
+        + `<td><span class="meter" title="${pct}% of this rating comes from games played">`
+        + `<span class="meter-fill" style="width:${pct}%"></span></span>`
+        + `<span class="note meter-label">${pct}%</span></td></tr>`;
+    }).join('');
+  }
+  $('#t25Depth').addEventListener('change', renderT25);
+  $('#t25Move').addEventListener('change', renderT25);
   renderT25();
 }
 
