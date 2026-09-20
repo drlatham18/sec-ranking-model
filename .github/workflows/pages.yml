@@ -5,14 +5,13 @@ on:
     branches: [main]
   workflow_dispatch:
   schedule:
-    # Lightweight results refresh during the football season; model fitting
-    # stays on Body 1. GitHub drops or delays queued scheduled runs under load,
-    # so the two anchors that matter get their own entries as well:
-    # Sunday morning (the whole weekend is final) and Thursday morning (line
-    # and schedule changes ahead of the Thursday-night window).
-    - cron: '17 */6 * 8-12 *'    # every six hours, 00:17/06:17/12:17/18:17 UTC
-    - cron: '20 11 * 8-12 0'     # Sunday ~07:20 ET
-    - cron: '20 11 * 8-12 4'     # Thursday ~07:20 ET
+    # Results and in-season ratings refresh every day, year round, so the site
+    # is never more than 24h stale even out of season. During the season the
+    # six-hourly run picks up Saturday finals the same night. Model FITTING
+    # (the preseason regression) still stays on Body 1; these runs only refresh
+    # results and recompute the in-season blend from them.
+    - cron: '20 11 * * *'        # daily ~07:20 ET, all year
+    - cron: '17 */6 * 8-12 *'    # every six hours, Aug-Dec
 
 permissions:
   contents: read

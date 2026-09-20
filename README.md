@@ -71,6 +71,8 @@ src/build_dataset.py  pulls raw endpoints -> data/processed/panel.csv, games.csv
 src/features.py       lagged / preseason feature construction
 src/fit.py            selection, walk-forward validation, game calibration
 src/rank.py           applies the winning model to a target season
+src/inseason.py       blends preseason ratings with results to date
+src/fit_inseason.py   fits + validates that blend, writes inseason_calibration.json
 src/matchup.py        head-to-head margins and win probabilities
 run_all.py            end-to-end: build -> fit -> rank
 ```
@@ -105,6 +107,7 @@ python src/build_ui.py                                 # rebuild the web UI
 | `sec_neutral_matrix_<year>.csv` | neutral-field win probability grid |
 | `calibration.json` | fitted HFA, rating-difference coefficient, residual SDs |
 | `data_quality.json` | source coverage, missingness and integrity checks |
+| `inseason_calibration.json` | shrinkage constant K, blend game coefficients, holdout metrics vs. the preseason baseline, accuracy-by-confidence tiers |
 
 ## Reading the validation output
 
@@ -159,6 +162,56 @@ Existing datasets must be rebuilt to create this provenance before refitting;
 fitting will fail clearly rather than guess from the number of played games.
 Committed model outputs are snapshots and are not refreshed by installing code.
 
+## In-season strength
+
+The preseason model cannot see the season being played. `src/inseason.py` folds
+completed games back into each rating: every result against a rated opponent
+yields an opponent- and venue-adjusted implied rating, and preseason is shrunk
+toward the mean of those by `weight = n / (n + K)`.
+
+`K` is not hand-set. It is chosen by leave-one-season-out log loss on the
+development seasons, then the holdout seasons are scored once. On 1,979
+untouched holdout games (2023-2025, week 3 on):
+
+| | preseason only | + in-season blend |
+|---|---|---|
+| Straight-up accuracy | 0.658 | **0.721** |
+| Brier | 0.209 | **0.182** |
+| Log loss | 0.601 | **0.538** |
+| Margin MAE | 13.87 | **12.53** |
+
+The gain holds in every week window and grows late in the year (week 13+:
+0.631 -> 0.727). A simultaneous ridge/SRS opponent solve was also tested and did
+*not* beat this simpler blend on development log loss, so it was not adopted.
+
+### How accurate can this get?
+
+An **oracle** fitted on the full season *including the game it predicts* --
+maximum leakage, impossible in practice -- reaches only **0.791** straight-up on
+this same game set. No honest team-strength model can beat that, and a target
+above it is not reachable by improving the model.
+
+What does clear a high bar is accuracy on the games the model is confident
+about. `fit_inseason.py` reports the whole accuracy-vs-coverage curve and marks
+the lowest confidence tier whose **95% lower bound** clears the target:
+
+| min confidence | games | coverage | accuracy | 95% CI |
+|---|---|---|---|---|
+| >=0.50 (every game) | 1979 | 100% | 0.721 | [0.700, 0.740] |
+| >=0.65 | 1222 | 62% | 0.813 | [0.790, 0.835] |
+| >=0.75 | 752 | 38% | 0.874 | [0.848, 0.897] |
+| **>=0.80** | **563** | **28%** | **0.895** | **[0.867, 0.919]** |
+| >=0.90 | 229 | 12% | 0.965 | [0.932, 0.985] |
+
+The shipped `playable_threshold` is the first tier meeting the target on its
+lower bound. Every game in `app_data.json` carries `confidence_current` and a
+`playable` flag derived from it. Coverage is the cost: the tier that clears 85%
+covers about a quarter of the slate.
+
+Sample size is the thing to watch. Ten games cannot establish reliability -- a
+9/11 result has a 95% interval of roughly [0.48, 0.98]. The numbers above rest
+on 1,979 games precisely so they mean something.
+
 ## Results and week-to-week comparisons
 
 The **Week to week** tab compares projected win totals, actual records, outlook
@@ -190,10 +243,9 @@ GitHub Pages now fetches results and checks integrity before every push/manual
 deployment. A failed refresh leaves the previously deployed site available.
 The page shows the source, check time, final-game count, and a stale-results
 notice after 48 hours. GitHub Actions refreshes results every six hours during
-August–December (00:17, 06:17, 12:17, and 18:17 UTC), plus dedicated Sunday and
-Thursday morning runs (11:20 UTC, ~07:20 ET) so the post-weekend and
-pre-Thursday-night refreshes still happen when GitHub delays or drops a queued
-run. Model fitting stays on Body 1. To manually refresh without a code change,
+every day year round at 11:20 UTC (~07:20 ET), and additionally every six hours
+during August–December (00:17, 06:17, 12:17, 18:17 UTC). Each run refreshes
+results and recomputes the in-season blend from them. Model fitting stays on Body 1. To manually refresh without a code change,
 run **Deploy GitHub Pages** from the repository's Actions tab.
 
 A scheduled refresh that fails opens (or comments on) a `refresh-failure` issue

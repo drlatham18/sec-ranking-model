@@ -1,0 +1,146 @@
+{
+  "method": "preseason rating shrunk toward opponent-adjusted in-season results",
+  "K": 5,
+  "K_selection": {
+    "criterion": "leave-one-season-out log loss on development seasons",
+    "development_seasons": [
+      2014,
+      2015,
+      2016,
+      2017,
+      2018,
+      2019,
+      2020,
+      2021,
+      2022
+    ],
+    "log_loss_by_K": {
+      "2": 0.5304083818815504,
+      "3": 0.5262437539007688,
+      "4": 0.5242735864858608,
+      "5": 0.523571869660505,
+      "6": 0.5236390775389599,
+      "8": 0.5250120601681113,
+      "10": 0.5271202411214782,
+      "14": 0.5317233641875599,
+      "20": 0.5377552350089576
+    }
+  },
+  "scale_b1": 0.8945737319141672,
+  "scale_hfa": 2.703218554671783,
+  "rating_diff_coef": 0.9140244583121893,
+  "home_field_advantage": 2.1558169567382115,
+  "residual_sd": 16.213902857743104,
+  "min_week_validated": 3,
+  "holdout_seasons": [
+    2023,
+    2024,
+    2025
+  ],
+  "holdout_metrics": {
+    "n_games": 1979,
+    "accuracy": 0.720565942395149,
+    "brier": 0.18196996860861525,
+    "log_loss": 0.5378789310656957,
+    "margin_mae": 12.529174464989408,
+    "margin_rmse": 15.779557731614865
+  },
+  "preseason_baseline_holdout": {
+    "n_games": 1979,
+    "accuracy": 0.6579080343607883,
+    "brier": 0.20849884530955198,
+    "log_loss": 0.6011969795046974,
+    "margin_mae": 13.867152346391704,
+    "margin_rmse": 17.422716781533303
+  },
+  "target_accuracy": 0.85,
+  "confidence_tiers": [
+    {
+      "min_confidence": 0.5,
+      "n_games": 1979,
+      "coverage": 1.0,
+      "accuracy": 0.7206,
+      "ci_low": 0.7002,
+      "ci_high": 0.7402,
+      "meets_target": false
+    },
+    {
+      "min_confidence": 0.55,
+      "n_games": 1708,
+      "coverage": 0.8631,
+      "accuracy": 0.75,
+      "ci_low": 0.7288,
+      "ci_high": 0.7704,
+      "meets_target": false
+    },
+    {
+      "min_confidence": 0.6,
+      "n_games": 1472,
+      "coverage": 0.7438,
+      "accuracy": 0.7779,
+      "ci_low": 0.7557,
+      "ci_high": 0.7989,
+      "meets_target": false
+    },
+    {
+      "min_confidence": 0.65,
+      "n_games": 1222,
+      "coverage": 0.6175,
+      "accuracy": 0.8134,
+      "ci_low": 0.7904,
+      "ci_high": 0.8349,
+      "meets_target": false
+    },
+    {
+      "min_confidence": 0.7,
+      "n_games": 973,
+      "coverage": 0.4917,
+      "accuracy": 0.8345,
+      "ci_low": 0.8097,
+      "ci_high": 0.8574,
+      "meets_target": false
+    },
+    {
+      "min_confidence": 0.75,
+      "n_games": 752,
+      "coverage": 0.38,
+      "accuracy": 0.8737,
+      "ci_low": 0.8478,
+      "ci_high": 0.8966,
+      "meets_target": false
+    },
+    {
+      "min_confidence": 0.8,
+      "n_games": 563,
+      "coverage": 0.2845,
+      "accuracy": 0.8952,
+      "ci_low": 0.8669,
+      "ci_high": 0.9193,
+      "meets_target": true
+    },
+    {
+      "min_confidence": 0.85,
+      "n_games": 383,
+      "coverage": 0.1935,
+      "accuracy": 0.9452,
+      "ci_low": 0.9174,
+      "ci_high": 0.9657,
+      "meets_target": true
+    },
+    {
+      "min_confidence": 0.9,
+      "n_games": 229,
+      "coverage": 0.1157,
+      "accuracy": 0.9651,
+      "ci_low": 0.9323,
+      "ci_high": 0.9848,
+      "meets_target": true
+    }
+  ],
+  "playable_threshold": 0.8,
+  "preseason_baseline_coefficients": {
+    "rating_diff_coef": 0.894426250092426,
+    "home_field_advantage": 2.3110181367031966,
+    "residual_sd": 17.666092754643838
+  }
+}
