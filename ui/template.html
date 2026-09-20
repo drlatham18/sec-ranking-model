@@ -275,7 +275,7 @@ footer{border-top:1px solid var(--line); padding:26px 0 60px; color:var(--muted)
     <div class="head-top">
       <div class="brand">
         <h1>Hedges &amp; <em>Margins</em></h1>
-        <p>A fitted preseason strength model for the 2026 SEC. Every weight is
+        <p>A fitted strength model for all 138 FBS teams, updated as the season is played. Every weight is
            estimated from historical results, then verified on seasons the
            selection process never saw.</p>
       </div>
@@ -283,6 +283,7 @@ footer{border-top:1px solid var(--line); padding:26px 0 60px; color:var(--muted)
     </div>
     <nav role="tablist">
       <button role="tab" aria-selected="true" data-tab="rank">Ranking</button>
+      <button role="tab" aria-selected="false" data-tab="top25">Top 25 vs AP</button>
       <button role="tab" aria-selected="false" data-tab="weekly">Week to week</button>
       <button role="tab" aria-selected="false" data-tab="team">Team Lens</button>
       <button role="tab" aria-selected="false" data-tab="lab">Matchup Lab</button>
@@ -326,6 +327,40 @@ footer{border-top:1px solid var(--line); padding:26px 0 60px; color:var(--muted)
       <div class="legend">
         <span><span class="sw" style="background:var(--accent)"></span>projected rating (points per game vs. an average team)</span>
         <span>&ldquo;Best record&rdquo; = share of 20,000 simulated seasons with the top SEC record (ties shared)</span>
+      </div>
+    </section>
+  </div>
+
+  <div class="panel" id="p-top25" hidden>
+    <section>
+      <div class="sec-head">
+        <h2>Our Top 25 vs the AP poll</h2>
+        <span class="note" id="t25Note"></span>
+        <div class="rank-tools">
+          <label class="f"><span class="eyebrow">Compare</span><select id="t25Mode">
+            <option value="same_information">Like for like</option>
+            <option value="as_published">Our latest vs AP</option>
+          </select></label>
+        </div>
+      </div>
+      <p class="note" id="t25Explain"></p>
+      <div class="tablewrap">
+        <table id="t25Table">
+          <thead><tr>
+            <th>#</th><th>Team</th><th class="num">Rating</th>
+            <th class="num">AP</th><th class="num">Diff</th><th style="width:180px">Who likes them more</th>
+          </tr></thead>
+          <tbody></tbody>
+        </table>
+      </div>
+      <div class="sec-head" style="margin-top:18px"><h3>Where we part ways</h3></div>
+      <div class="tablewrap">
+        <table id="t25Diff"><thead><tr><th>Disagreement</th><th>Teams</th></tr></thead><tbody></tbody></table>
+      </div>
+      <div class="legend">
+        <span><span class="sw" style="background:var(--accent)"></span>we rank them higher than AP</span>
+        <span><span class="sw" style="background:var(--muted)"></span>AP ranks them higher</span>
+        <span>A rating estimates points vs. an average opponent; a poll is voters weighing record and reputation. They are not the same measurement, and are not expected to agree.</span>
       </div>
     </section>
   </div>
@@ -690,6 +725,48 @@ $('#weeklySelect').addEventListener('change',()=>{
   history.replaceState(null,'',u);
 });
 renderWeekly();
+
+/* ---------------- top 25 vs AP ---------------- */
+const PC = D.poll_comparison;
+if(!PC || !PC.polls || !PC.polls.ap){
+  const b=document.querySelector('nav button[data-tab="top25"]'); if(b) b.remove();
+  const pn=$('#p-top25'); if(pn) pn.remove();
+}else{
+  const apPoll = PC.polls.ap;
+  $('#t25Note').textContent = `${apPoll.headline||'AP Top 25'} \u00b7 voted on games through week ${apPoll.information_through}`;
+  const t25b = $('#t25Table tbody'), t25d = $('#t25Diff tbody');
+  function renderT25(){
+    const mode = $('#t25Mode').value;
+    const cmp = PC.comparisons.ap[mode];
+    $('#t25Explain').textContent = mode === 'same_information'
+      ? `Our ranking recomputed using only the games the voters had seen (through week ${apPoll.information_through}), so neither side has an information advantage.`
+      : `Our current ranking, which already includes results the voters had not seen when this poll was published.`;
+    t25b.innerHTML = cmp.rows.map(r => {
+      const d = r.delta;
+      const tag = d === null ? '<span class="note">unranked by AP</span>'
+        : d > 0 ? `<span style="color:var(--accent)">we do, by ${d}</span>`
+        : d < 0 ? `<span class="note">AP does, by ${Math.abs(d)}</span>`
+        : '<span class="note">agree</span>';
+      return `<tr><td>${r.model_rank}</td><td>${r.team}</td>`
+        + `<td class="num">${r.rating.toFixed(2)}</td>`
+        + `<td class="num">${r.poll_rank ?? '&mdash;'}</td>`
+        + `<td class="num">${d === null ? '&mdash;' : (d>0?'+':'')+d}</td>`
+        + `<td>${tag}</td></tr>`;
+    }).join('');
+    const they = cmp.they_rank_we_do_not.map(x => `${x.team} (AP ${x.poll_rank})`).join(', ') || '&mdash;';
+    const we = cmp.we_rank_they_do_not.join(', ') || '&mdash;';
+    const big = cmp.biggest_disagreements.map(r =>
+      `${r.team} (us ${r.model_rank}, AP ${r.poll_rank})`).join(', ') || '&mdash;';
+    t25d.innerHTML = [
+      ['We rank them, AP does not', we],
+      ['AP ranks them, we do not', they],
+      ['Largest gaps among teams both rank', big],
+      ['Teams in both top 25s', `${cmp.overlap} of 25`],
+    ].map(([k,v]) => `<tr><td>${k}</td><td>${v}</td></tr>`).join('');
+  }
+  $('#t25Mode').addEventListener('change', renderT25);
+  renderT25();
+}
 
 /* ---------------- matchup lab ---------------- */
 const all = D.all_ratings.slice().sort((a,b) => a.team.localeCompare(b.team));

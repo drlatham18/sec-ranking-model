@@ -72,6 +72,7 @@ src/features.py       lagged / preseason feature construction
 src/fit.py            selection, walk-forward validation, game calibration
 src/rank.py           applies the winning model to a target season
 src/inseason.py       blends preseason ratings with results to date
+src/polls.py          AP / Coaches polls and the comparison to our own Top 25
 src/fit_inseason.py   fits + validates that blend, writes inseason_calibration.json
 src/matchup.py        head-to-head margins and win probabilities
 run_all.py            end-to-end: build -> fit -> rank
@@ -161,6 +162,26 @@ completion, agreement with the games dataset, and February 1 after the season.
 Existing datasets must be rebuilt to create this provenance before refitting;
 fitting will fail clearly rather than guess from the number of played games.
 Committed model outputs are snapshots and are not refreshed by installing code.
+
+## Top 25 vs the AP poll
+
+`src/polls.py` pulls the AP and Coaches polls from ESPN's keyless rankings
+endpoint, so this costs nothing against the CFBD key quota, and lines them up
+against our own top 25 by current rating.
+
+One timing trap is made explicit rather than glossed over: **the poll labelled
+"Week N" is voted before week N is played**, so it reflects results through
+week N-1. Comparing it against a rating that already includes week N would
+flatter the rating. The UI therefore offers two views:
+
+- **Like for like** - our ranking recomputed using only the games the voters
+  had seen, so neither side has an information advantage.
+- **Our latest vs AP** - our current ranking, which knows more than the poll did.
+
+A rating and a poll are not the same measurement. `sp_overall` estimates points
+per game against an average opponent; a poll is voters weighing record,
+opponent quality and reputation. Their disagreements are the output, not an
+error in either.
 
 ## In-season strength
 

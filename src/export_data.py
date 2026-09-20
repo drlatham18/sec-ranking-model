@@ -17,6 +17,7 @@ import build_dataset as BD
 import schedule_data
 import weekly
 import inseason
+import polls
 
 ROOT = pathlib.Path(__file__).resolve().parents[1]
 OUT = ROOT / "output"
@@ -173,6 +174,38 @@ def build(season=2026, conference="SEC", source="auto", refresh=False):
     else:
         current_grid = None
 
+    # --- our Top 25, and the human polls to compare it against ----------
+    # Ratings first: current strength if the blend is available, otherwise the
+    # preseason projection, so a Top 25 always exists.
+    rank_basis = cmap if cmap else rmap
+    top25 = polls.model_top(rank_basis, 25)
+    poll_block = None
+    try:
+        parsed = polls.parse(polls.fetch(season), rmap.keys())
+        poll_block = {"polls": parsed, "comparisons": {}}
+        for kind, poll in parsed.items():
+            cutoff = poll.get("information_through")
+            # Rank the model on the SAME games the voters had, so the
+            # comparison is not flattered by results they could not see.
+            if cutoff and strength is not None:
+                seen = full[full.completed & (full.week <= cutoff)]
+                rows = [{"home": r.home_team, "away": r.away_team,
+                         "home_points": r.home_points, "away_points": r.away_points,
+                         "neutral": bool(r.neutral)} for _, r in seen.iterrows()]
+                matched = inseason.current_ratings(rows, rmap, cal_in)
+                basis = {t: v["blended"] for t, v in matched.items()}
+            else:
+                basis = rank_basis
+            like_for_like = polls.model_top(basis, 25)
+            poll_block["comparisons"][kind] = {
+                "as_published": polls.compare(top25, poll),
+                "same_information": polls.compare(like_for_like, poll),
+                "model_top25_at_cutoff": like_for_like,
+            }
+    except Exception as error:                        # noqa: BLE001 - poll feed fault
+        print("[export] polls unavailable (%s); Top 25 published without them"
+              % str(error)[:200])
+
     oos = pd.read_csv(OUT / "oos_predictions.csv")
     explanation_path = OUT / ("explanations_%d.json" % season)
     explanations = json.loads(explanation_path.read_text()) \
@@ -213,6 +246,9 @@ def build(season=2026, conference="SEC", source="auto", refresh=False):
         "teams": sec.round(3).to_dict("records"),
         "all_ratings": ratings.round(2).to_dict("records"),
         "games": games,
+        "top25": top25,
+        "top25_basis": "current_rating" if cmap else "preseason_rating",
+        "poll_comparison": poll_block,
         "neutral_grid": grid,
         "current_grid": current_grid,
         "inseason": ({"calibration": cal_in,
