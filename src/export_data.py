@@ -51,8 +51,12 @@ def build(season=2026, conference="SEC", source="auto", refresh=False):
     sec = ratings[ratings.conference == conference].copy()
     sec_teams = set(sec.team)
 
-    sched, source_info = schedule_data.fetch_schedule(season, source, refresh)
-    sched = sched[sched.home_team.isin(sec_teams) | sched.away_team.isin(sec_teams)]
+    # ONE fetch serves both the conference schedule and the all-FBS results the
+    # in-season blend needs. CFBD returns the whole season per request and the
+    # key is capped monthly, so fetching twice would double the quota spend for
+    # identical data.
+    full, source_info = schedule_data.fetch_consensus(season, source, refresh)
+    sched = full[full.home_team.isin(sec_teams) | full.away_team.isin(sec_teams)]
 
     schedule_data.validate_schedule(sched, sec_teams)
     p_fcs, n_fcs = fcs_win_rate()
@@ -67,7 +71,7 @@ def build(season=2026, conference="SEC", source="auto", refresh=False):
     try:
         cal_in = inseason.load_calibration()
         if through_week:
-            fbs = schedule_data.fbs_results(season, through_week, source, refresh)
+            fbs = full[full.completed]
             results = [{"home": r.home_team, "away": r.away_team,
                         "home_points": r.home_points, "away_points": r.away_points,
                         "neutral": bool(r.neutral)} for _, r in fbs.iterrows()]

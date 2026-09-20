@@ -232,9 +232,27 @@ python src/build_ui.py
 python src/export_data.py 2026 SEC --source espn --refresh
 ```
 
-CFBD is used when `CFBD_API_KEY` or `~/.cfbd_key` is configured. Otherwise the
-exporter uses ESPN's public SEC scoreboard. Explicit CFBD errors fail the build
-rather than silently publishing empty data. Both adapters require a final-game
+Both feeds are consulted every run. CFBD returns the whole season in **one**
+request, so it is the spine when `CFBD_API_KEY` or `~/.cfbd_key` is configured;
+ESPN is keyless but needs a request per conference per week, so it audits.
+
+**Cross-checking.** The two sources name FCS schools differently, so merging
+them would duplicate games. The spine stays authoritative for which games
+exist; the other feed audits only the games matching on week and both team
+names. A final score the feeds *disagree* on is not published at all -- one of
+them is wrong, and a wrong score silently corrupts every rating built on it, so
+that game is marked unplayed and the conflict is recorded in
+`data_source.audit`. Games that cannot be matched are counted `unverified`.
+
+Either source failing is survivable and logged; both failing fails the build. A
+game flagged complete with no final score (a cancellation) is treated as not
+played rather than killing the run, but a feed *full* of them still fails.
+
+**API quota.** CFBD keys allow 1000 requests/month. A build spends **exactly
+one** -- the schedule and the all-FBS in-season results come from the same
+response, and a test pins that count so it cannot regress. At the shipped
+cadence (daily year round, plus six-hourly in August-December) that is about
+155 requests in a peak month, leaving room for manual runs. Both adapters require a final-game
 flag before locking a score. All 120 games are included, including FCS opponents;
 conference record denominators come from the actual nine-game 2026 schedule.
 Incomplete schedules are rejected before replacing the previous output.
