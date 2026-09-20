@@ -82,12 +82,14 @@ class WeeklyResultsTests(unittest.TestCase):
 
         with patch.object(schedule_data.requests, "get", side_effect=fake_get):
             frame, metadata = schedule_data.fetch_schedule(2026, "espn")
-        self.assertEqual(len(calls), len(schedule_data.ESPN_WEEKS))
+        # every FBS conference, every regular-season week
+        self.assertEqual(len(calls), len(schedule_data.ESPN_FBS_GROUPS)
+                         * len(schedule_data.ESPN_WEEKS))
         for params in calls:
             self.assertEqual(params["dates"], 2026)
             self.assertEqual(params["seasontype"], 2)
             self.assertNotIn("-", str(params["dates"]))
-        self.assertEqual(sorted(frame.week), list(schedule_data.ESPN_WEEKS))
+        self.assertEqual(sorted(set(frame.week)), list(schedule_data.ESPN_WEEKS))
         self.assertEqual(metadata["provider"], "espn")
         self.assertTrue(metadata["cache_bypassed"])
 
@@ -104,7 +106,9 @@ class WeeklyResultsTests(unittest.TestCase):
                 patch.object(schedule_data.time, "sleep"):
             with self.assertRaises(ValueError):  # empty schedule, not a 500
                 schedule_data.fetch_schedule(2026, "espn")
-        self.assertEqual(attempts.count(2), 2)  # retried once, then succeeded
+        # week 2 is requested once per conference group, plus one retry
+        self.assertEqual(attempts.count(2),
+                         len(schedule_data.ESPN_FBS_GROUPS) + 1)
 
         def broken(url, params=None, timeout=None):
             return FakeResponse({}, status=400)
