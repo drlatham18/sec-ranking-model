@@ -23,19 +23,27 @@ class BestBets(unittest.TestCase):
         self.assertFalse(row['mismatch'])
         self.assertTrue(row['good_buy'])
 
-    def test_no_momentum_no_cashout_claim(self):
+    def test_missing_or_negative_momentum_does_not_hide_flag(self):
         for change in [None, -.01, 0]:
-            self.assertFalse(b.classify(.7, .6, (.38, .4, 200, 200), .05, change)['good_buy'])
+            row = b.classify(.7, .6, (.38, .4, 200, 200), .05, change)
+            self.assertTrue(row['good_buy'])
+            self.assertTrue(row['notes'])
 
-    def test_illiquid_and_wide_books_excluded(self):
+    def test_illiquid_and_wide_books_are_annotated(self):
         for quote in [(.3, .4, 200, 200), (.38, .4, 20, 200)]:
             r = b.classify(.7, .6, quote, .05, .03)
-            self.assertFalse(r['mismatch'])
-            self.assertFalse(r['good_buy'])
+            self.assertTrue(r['mismatch'])
+            self.assertTrue(r['good_buy'])
+            self.assertTrue(r['notes'])
 
-    def test_fee_can_remove_an_apparent_edge(self):
-        r = b.classify(.55, .6, (.48, .50, 200, 200), .05, .02)
-        self.assertFalse(r['mismatch'])
+    def test_tiny_edge_and_unknown_fees_still_flagged(self):
+        r = b.classify(.505, .6, (.48, .50, 200, 200), .05, .02)
+        self.assertTrue(r['mismatch'])
+        self.assertTrue(r['good_buy'])
+        self.assertLess(r['net_edge'], 0)
+        r = b.classify(.505, .6, (.48, .50, 200, 200), None, None)
+        self.assertTrue(r['mismatch'])
+        self.assertIsNone(r['entry_cost'])
 
     def test_book_validation_and_unsorted_levels(self):
         book = dict(asset_id='1', timestamp=NOW.timestamp()*1000,
@@ -95,7 +103,9 @@ class BestBets(unittest.TestCase):
         self.assertAlmostEqual(report['rows'][0]['model_probability'], .65)
         self.assertTrue(report['rows'][0]['mismatch'])
         market['feeSchedule']['exponent'] = 2
-        self.assertEqual(b.build(model, NOW, fetch, [event])['rows'], [])
+        report = b.build(model, NOW, fetch, [event])
+        self.assertEqual(len(report['rows']), 2)
+        self.assertIn('Fees unavailable', report['rows'][0]['notes'])
 
     def test_refresh_cadence_and_eastern_date(self):
         path = pathlib.Path(__file__).resolve().parents[1] / 'scripts/refresh_due.py'

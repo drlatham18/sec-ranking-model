@@ -104,19 +104,26 @@ def classify(p, other_mid, quote, fee_rate, change):
     mid = (bid + ask) / 2
     market_p = mid / (mid + other_mid)
     fee = lambda price: fee_rate * price * (1 - price)
-    cost = ask + fee(ask)
-    edge = p - cost
-    # Explicit screening thresholds, not fitted model coefficients.
-    liquid = ask - bid <= .04 + 1e-9 and min(bid_size, ask_size) >= 100
-    mismatch = p > .5 and market_p < .5 and edge >= .05 and liquid
+    cost = ask + fee(ask) if fee_rate is not None else None
+    edge = p - cost if cost is not None else None
+    # Flags describe disagreements; execution considerations are annotations.
+    mismatch = p > .5 and market_p < .5
     target = ask + (p - ask) / 2
-    gain = target - fee(target) - cost
-    good_buy = (liquid and edge >= .05 and change is not None and change >= .01
-                and gain >= .02)
+    gain = target - fee(target) - cost if cost is not None else None
+    good_buy = p > ask
+    notes = []
+    if ask - bid > .04 + 1e-9: notes.append('Wide bid/ask spread')
+    if min(bid_size, ask_size) < 100: notes.append('Thin top-of-book liquidity')
+    if fee_rate is None: notes.append('Fees unavailable')
+    if change is None: notes.append('24-hour movement unavailable')
+    elif change <= 0: notes.append('No upward 24-hour momentum')
+    if edge is not None and edge <= 0: notes.append('Entry fees erase model edge')
+    if gain is not None and gain <= 0: notes.append('Exit scenario does not cover fees')
     return dict(model_probability=p, market_probability=market_p, bid=bid, ask=ask,
                 bid_size=bid_size, ask_size=ask_size, entry_cost=cost, net_edge=edge,
                 change_24h=change, target=target, scenario_gain=gain,
-                scenario_return=gain / cost, mismatch=mismatch, good_buy=good_buy)
+                scenario_return=gain / cost if cost else None, mismatch=mismatch,
+                good_buy=good_buy, model_gap=p-market_p, notes=notes)
 
 
 def build(model, now=None, fetch=get, events=None):
@@ -147,9 +154,10 @@ def build(model, now=None, fetch=get, events=None):
                     rate = 0.
                 else:
                     schedule = market.get('feeSchedule', {})
-                    rate = float(schedule['rate'])
-                    if schedule.get('exponent') != 1 or not 0 <= rate <= 1:
-                        raise ValueError('Unknown fee schedule')
+                    rate = schedule.get('rate')
+                    rate = float(rate) if rate is not None else None
+                    if schedule.get('exponent') != 1 or rate is None or not 0 <= rate <= 1:
+                        rate = None
                 quotes = [top(fetch(CLOB + '/book', token_id=t), t, now) for t in tokens]
                 seen.add(game['id'])
                 result['matched_games'] += 1
@@ -171,7 +179,13 @@ def build(model, now=None, fetch=get, events=None):
                     result['rows'].append(row)
             except (requests.RequestException, ValueError, KeyError, TypeError) as e:
                 result['skipped'].append(dict(event=event.get('title', ''), reason=str(e)))
-    result['rows'].sort(key=lambda r: r['net_edge'], reverse=True)
+    result['rows'].sort(key=lambda r: r['model_gap'], reverse=True)
+    result['upcoming'] = [dict(home=g['home'], away=g['away'], kickoff=g.get('kickoff'),
+                               date=g.get('date'), probability=g.get('p_home_current'),
+                               market_found=g['id'] in seen)
+                          for g in model['games'] if not g['played']
+                          and (stamp(g.get('kickoff')) or now) > now]
+    result['upcoming'].sort(key=lambda g: g['kickoff'])
     return result
 
 

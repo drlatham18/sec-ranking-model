@@ -288,10 +288,9 @@ footer{border-top:1px solid var(--line); padding:26px 0 60px; color:var(--muted)
       <div class="chips" id="chips"></div>
     </div>
     <nav role="tablist">
-      <button role="tab" aria-selected="true" data-tab="rank">Ranking</button>
+      <button role="tab" aria-selected="true" data-tab="bets">Best Bets</button>
       <button role="tab" aria-selected="false" data-tab="top25">Top 25</button>
       <button role="tab" aria-selected="false" data-tab="weekly">Week to week</button>
-      <button role="tab" aria-selected="false" data-tab="bets">Best Bets</button>
       <button role="tab" aria-selected="false" data-tab="team">Team Lens</button>
       <button role="tab" aria-selected="false" data-tab="lab">Matchup Lab</button>
       <button role="tab" aria-selected="false" data-tab="grid">Neutral Grid</button>
@@ -571,15 +570,17 @@ footer{border-top:1px solid var(--line); padding:26px 0 60px; color:var(--muted)
       <p class="note">Refresh target: every 6 hours, every 30 minutes on SEC game days (Eastern time). Scheduled runs can be delayed. These are Global contracts, separate from Polymarket US.</p>
     </div>
     <section><div class="sec-head"><h2>Straight mismatch</h2><span class="note">Our winner is the market underdog</span></div>
-      <p>Model win chance above 50%, market chance below 50%, and at least 5 percentage points of edge after estimated entry fees.</p>
+      <p>We project this team to win, while the market favors its opponent. Every disagreement is flagged, regardless of its size.</p>
       <div id="betsMismatch"></div>
     </section>
     <section style="margin-top:32px"><div class="sec-head"><h2>Good buy</h2><span class="note">Price-movement watchlist</span></div>
-      <p>At least 5 points of model edge, a rise of at least 1¢ over 24 hours, and at least 2¢ per share of potential net gain if the price closes half the gap to our model.</p>
+      <p>The asking price is below our model's win probability. A possible repricing opportunity—even for a projected loser. Movement, fees, and liquidity are context for your judgment, not filters.</p>
       <div id="betsBuy"></div>
     </section>
-    <details class="card" style="margin-top:24px"><summary>How candidates qualify</summary>
-      <p>Both categories require a spread of 4¢ or less and at least 100 shares at each best bid and ask. We match both teams and kickoff time, exclude started games, and use the current in-season probability including venue. Unknown fees or stale books exclude a market.</p>
+    <section style="margin-top:32px"><div class="sec-head"><h2>All market comparisons</h2></div><div id="betsAll"></div></section>
+    <section style="margin-top:32px"><div class="sec-head"><h2>Upcoming SEC matchups</h2><span class="note">Model outlook · market coverage</span></div><div id="betsUpcoming"></div></section>
+    <details class="card" style="margin-top:24px"><summary>How flags work</summary>
+      <p>There is no minimum edge, liquidity, or momentum requirement. Thin liquidity, wide spreads, missing fees, and price movement appear as notes. We still match both teams and kickoff time and exclude started games, props, and invalid quotes so comparisons refer to the same event.</p>
       <p>The good-buy exit is a scenario, not a trained price forecast. Momentum does not establish that odds will keep moving. The gain includes estimated entry and exit taker fees, but future liquidity and slippage are unknown. A team can appear in both categories. No orders are placed by this page.</p>
       <p><a href="https://docs.polymarket.com/trading/fees" target="_blank" rel="noopener">Polymarket fee methodology</a></p>
       <div id="betsSkipped"></div>
@@ -608,14 +609,14 @@ const delta = (v, digits=2, suffix='') => v == null ? '—' : (v>0?'+':'')+v.toF
 const css = n => getComputedStyle(document.documentElement).getPropertyValue(n).trim();
 function renderBets(){
   const esc = s => String(s).replace(/[&<>"']/g, c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
-  const cents = n => (n*100).toFixed(1)+'¢';
+  const cents = n => n==null?'Unavailable':(n*100).toFixed(1)+'¢';
   const age = Date.now() - Date.parse(B.checked_at);
   const today = new Intl.DateTimeFormat('en-CA',{timeZone:'America/New_York'}).format(new Date());
   const gameDay = D.games.some(g => g.kickoff && new Intl.DateTimeFormat('en-CA',{timeZone:'America/New_York'}).format(new Date(g.kickoff))===today);
   const fresh = B.status==='ok' && age>=-60000 && age <= (gameDay?75:420)*60000;
-  $('#betsFreshness').textContent = `${B.checked_at?'Markets checked '+new Date(B.checked_at).toLocaleString():'Markets not checked'} · ${B.model_at?'Model updated '+new Date(B.model_at).toLocaleString():''}${fresh?'':' · Refresh unavailable or overdue; candidates hidden.'}`;
+  $('#betsFreshness').textContent = `${B.checked_at?'Markets checked '+new Date(B.checked_at).toLocaleString():'Markets not checked'} · ${B.model_at?'Model updated '+new Date(B.model_at).toLocaleString():''}${fresh?'':' · Refresh unavailable or overdue; any comparisons below are dated snapshots.'}`;
   $('#betsCoverage').textContent = `${B.matched_games||0} SEC matchups matched across ${B.events_scanned||0} college-football events scanned.`;
-  const rows = fresh ? (B.rows||[]).filter(r=>Date.parse(r.kickoff)>Date.now()) : [];
+  const rows = (B.rows||[]).filter(r=>Date.parse(r.kickoff)>Date.now());
   for(const [key,id] of [['mismatch','betsMismatch'],['good_buy','betsBuy']]){
     const selected=rows.filter(r=>r[key]);
     $('#'+id).innerHTML = selected.length ? selected.map(r=>`<article class="card" style="margin-bottom:14px">
@@ -624,12 +625,16 @@ function renderBets(){
       <div class="chips"><div class="chip"><span class="k">Model win chance</span><span class="v">${pct(r.model_probability)}</span></div>
       <div class="chip"><span class="k">Market chance</span><span class="v">${pct(r.market_probability)}</span></div>
       <div class="chip"><span class="k">Buy / sell now</span><span class="v">${cents(r.ask)} / ${cents(r.bid)}</span></div>
-      <div class="chip"><span class="k">Net model edge</span><span class="v">${(r.net_edge*100).toFixed(1)} pp</span></div></div>
-      ${key==='good_buy'?`<p><strong>Exit scenario: ${cents(r.target)}</strong> · Net gain ${cents(r.scenario_gain)}/share (${pct(r.scenario_return)}) if reached before kickoff. Last 24h: +${cents(r.change_24h)}.</p>`:''}
+      <div class="chip"><span class="k">Model vs market</span><span class="v">${(r.model_gap*100).toFixed(1)} pp</span></div></div>
+      ${key==='good_buy'?`<p><strong>Exit scenario: ${cents(r.target)}</strong> · Net gain ${cents(r.scenario_gain)}/share ${r.scenario_return==null?'':'('+pct(r.scenario_return)+')'} if reached before kickoff. Last 24h: ${r.change_24h==null?'Unavailable':(r.change_24h>0?'+':'')+cents(r.change_24h)}.</p>`:''}
       <p class="note">${Math.floor(r.ask_size)} shares offered at ask · ${Math.floor(r.bid_size)} shares bid · Entry incl. estimated fee ${cents(r.entry_cost)}/share. Market chance uses normalized bid/ask midpoints.</p>
-    </article>`).join('') : `<div class="card">${fresh?'No qualifying candidates in this scan. New game markets may not yet be listed.':'Waiting for a fresh market scan.'}</div>`;
+      <p class="note">${(r.notes||[]).map(esc).join(' · ')}</p>
+    </article>`).join('') : `<div class="card">${rows.length?'No '+(key==='mismatch'?'winner disagreements':'prices below model probability')+' in the matched markets.':B.status==='ok'?'No upcoming SEC moneylines matched in this scan. See the matchups and coverage below.':'Market feed unavailable. Model matchups are shown below.'}</div>`;
   }
-  $('#betsSkipped').textContent = `${(B.skipped||[]).length} contracts excluded (unmatched, started, unavailable, or unsupported).`;
+  $('#betsAll').innerHTML = rows.length?`<div class="tablewrap"><table><thead><tr><th>Team / matchup</th><th>Model</th><th>Market</th><th>Ask</th><th>Gap</th><th>Context</th></tr></thead><tbody>${rows.map(r=>`<tr><td>${esc(r.team)}<br><small>${esc(r.away)} at ${esc(r.home)}</small></td><td>${pct(r.model_probability)}</td><td>${pct(r.market_probability)}</td><td>${cents(r.ask)}</td><td>${(r.model_gap*100).toFixed(1)} pp</td><td>${(r.notes||[]).map(esc).join(' · ')||'—'}</td></tr>`).join('')}</tbody></table></div>`:'<p>No matched market prices yet. This does not mean the model agrees with the market; there is no comparable price in the current feed.</p>';
+  const upcoming = D.games.filter(g=>!g.played && Date.parse(g.kickoff)>Date.now()).sort((a,b)=>Date.parse(a.kickoff)-Date.parse(b.kickoff));
+  $('#betsUpcoming').innerHTML = `<div class="tablewrap"><table><thead><tr><th>Matchup</th><th>Kickoff</th><th>Model winner</th><th>Win chance</th><th>Polymarket</th></tr></thead><tbody>${upcoming.map(g=>{const p=g.p_home_current;const winner=p==null?'Unavailable':p===.5?'Even':p>.5?g.home:g.away;const found=rows.some(r=>r.home===g.home&&r.away===g.away);return `<tr><td>${esc(g.away)} at ${esc(g.home)}${g.neutral?' (neutral)':''}</td><td>${esc(new Date(g.kickoff).toLocaleString())}</td><td>${esc(winner)}</td><td>${p==null?'—':pct(Math.max(p,1-p))}</td><td>${found?'Compared above':'Market not found / no comparable quote'}</td></tr>`;}).join('')}</tbody></table></div>`;
+  $('#betsSkipped').innerHTML = `<p>${(B.skipped||[]).length} contracts could not be compared:</p><ul>${(B.skipped||[]).map(s=>`<li>${esc(s.event)} — ${esc(s.reason)}</li>`).join('')}</ul>`;
 }
 renderBets();
 setInterval(renderBets,60000);
@@ -1127,7 +1132,7 @@ $('#calKV').innerHTML = [
 ].map(([k,v]) => `<dt>${k}</dt><dd>${v}</dd>`).join('');
 
 const requestedTab=new URL(location.href).searchParams.get('tab');
-activateTab(requestedTab||'rank',false);
+activateTab(requestedTab||'bets',false);
 </script>
 </body>
 </html>
