@@ -113,6 +113,7 @@ def build(season=2026, conference="SEC", source="auto", refresh=False):
             "id": str(r.id),
             "week": int(r.week) if pd.notna(r.week) else None,
             "date": str(r.start_date)[:10] if r.start_date else None,
+            "kickoff": str(r.start_date) if r.start_date else None,
             "home": r.home_team, "away": r.away_team,
             "home_conf": r.home_conference, "away_conf": r.away_conference,
             "neutral": bool(r.neutral), "conf_game": bool(r.conference_game),

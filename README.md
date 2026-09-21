@@ -2,6 +2,33 @@
 
 Public site: https://drlatham18.github.io/sec-ranking-model/
 
+## Best Bets
+
+Open `?tab=bets` for read-only SEC full-game moneyline comparisons against
+**Polymarket Global** (not Polymarket US). Public Gamma/CLOB endpoints require
+no copied trading credentials. `src/best_bets.py` runs after the results export
+and the build embeds `output/best_bets.json` in the page.
+
+Straight mismatch means our current in-season model favors the market underdog,
+with at least 5 percentage points of edge after entry fees. Good buy adds positive
+24-hour momentum of at least 1 cent and a hypothetical exit halfway from the ask
+to model fair value, with at least 2 cents/share left after entry and exit fees.
+This is a transparent screening heuristic, not a validated price-movement model.
+Both screens require a spread at most 4 cents and at least 100 shares on each side
+of the top of book. Thresholds do not alter the fitted ranking model.
+
+Exact teams and kickoff must match the model schedule. Started games, unrated
+teams, unknown fees, stale books, and partial/prop contracts are excluded.
+No market-feed failure reuses old candidates as fresh; the page shows an unavailable
+state. Candidate display expires after 7 hours normally or 75 minutes on game days,
+and at kickoff. The page reports coverage even when no candidates qualify.
+
+The existing Pages workflow checks every 30 minutes and deploys every six hours
+normally, or every half hour on SEC game days in America/New_York. Its gate checks
+the stored schedule plus ESPN for reschedules. GitHub schedules are best effort
+and can be delayed. Results and market prices refresh; the preseason fit does not
+retrain. No second scheduler or trading runner is created.
+
 A preseason team-strength model for SEC football. Every weight in it is
 estimated from historical data by regression; none is assigned by hand.
 

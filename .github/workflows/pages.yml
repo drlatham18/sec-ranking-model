@@ -5,13 +5,8 @@ on:
     branches: [main]
   workflow_dispatch:
   schedule:
-    # Results and in-season ratings refresh every day, year round, so the site
-    # is never more than 24h stale even out of season. During the season the
-    # six-hourly run picks up Saturday finals the same night. Model FITTING
-    # (the preseason regression) still stays on Body 1; these runs only refresh
-    # results and recompute the in-season blend from them.
-    - cron: '20 11 * * *'        # daily ~07:20 ET, all year
-    - cron: '17 */6 * 8-12 *'    # every six hours, Aug-Dec
+    # Gate below chooses six-hour refreshes or every half hour on SEC game days.
+    - cron: '7,37 * * * *'
 
 permissions:
   contents: read
@@ -24,7 +19,21 @@ concurrency:
   cancel-in-progress: false
 
 jobs:
+  cadence:
+    runs-on: ubuntu-latest
+    outputs:
+      due: ${{ steps.cadence.outputs.due }}
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+      - run: python -m pip install requests
+      - id: cadence
+        run: python scripts/refresh_due.py
   deploy:
+    needs: cadence
+    if: needs.cadence.outputs.due == 'true'
     environment:
       name: github-pages
       url: ${{ steps.deployment.outputs.page_url }}
@@ -47,6 +56,8 @@ jobs:
         run: python src/export_data.py 2026 SEC --refresh
       - name: Check model and results integrity
         run: python -m unittest discover -s tests -v
+      - name: Refresh read-only Polymarket comparisons
+        run: python src/best_bets.py
       - name: Build site
         env:
           SITE_ORIGIN: https://drlatham18.github.io/sec-ranking-model

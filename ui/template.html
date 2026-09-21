@@ -291,6 +291,7 @@ footer{border-top:1px solid var(--line); padding:26px 0 60px; color:var(--muted)
       <button role="tab" aria-selected="true" data-tab="rank">Ranking</button>
       <button role="tab" aria-selected="false" data-tab="top25">Top 25</button>
       <button role="tab" aria-selected="false" data-tab="weekly">Week to week</button>
+      <button role="tab" aria-selected="false" data-tab="bets">Best Bets</button>
       <button role="tab" aria-selected="false" data-tab="team">Team Lens</button>
       <button role="tab" aria-selected="false" data-tab="lab">Matchup Lab</button>
       <button role="tab" aria-selected="false" data-tab="grid">Neutral Grid</button>
@@ -562,6 +563,28 @@ footer{border-top:1px solid var(--line); padding:26px 0 60px; color:var(--muted)
       </div>
     </section>
   </div>
+  <div class="panel" id="p-bets" hidden>
+    <div class="sec-head"><h2>Best Bets</h2><span class="note">SEC head-to-head · Polymarket Global</span></div>
+    <p>Current model probabilities against full-game moneylines. Buy prices use the ask; cash-out prices use the bid.</p>
+    <p class="note" id="betsFreshness" role="status"></p>
+    <div class="card" style="margin:20px 0"><strong id="betsCoverage"></strong>
+      <p class="note">Refresh target: every 6 hours, every 30 minutes on SEC game days (Eastern time). Scheduled runs can be delayed. These are Global contracts, separate from Polymarket US.</p>
+    </div>
+    <section><div class="sec-head"><h2>Straight mismatch</h2><span class="note">Our winner is the market underdog</span></div>
+      <p>Model win chance above 50%, market chance below 50%, and at least 5 percentage points of edge after estimated entry fees.</p>
+      <div id="betsMismatch"></div>
+    </section>
+    <section style="margin-top:32px"><div class="sec-head"><h2>Good buy</h2><span class="note">Price-movement watchlist</span></div>
+      <p>At least 5 points of model edge, a rise of at least 1¢ over 24 hours, and at least 2¢ per share of potential net gain if the price closes half the gap to our model.</p>
+      <div id="betsBuy"></div>
+    </section>
+    <details class="card" style="margin-top:24px"><summary>How candidates qualify</summary>
+      <p>Both categories require a spread of 4¢ or less and at least 100 shares at each best bid and ask. We match both teams and kickoff time, exclude started games, and use the current in-season probability including venue. Unknown fees or stale books exclude a market.</p>
+      <p>The good-buy exit is a scenario, not a trained price forecast. Momentum does not establish that odds will keep moving. The gain includes estimated entry and exit taker fees, but future liquidity and slippage are unknown. A team can appear in both categories. No orders are placed by this page.</p>
+      <p><a href="https://docs.polymarket.com/trading/fees" target="_blank" rel="noopener">Polymarket fee methodology</a></p>
+      <div id="betsSkipped"></div>
+    </details>
+  </div>
 </main>
 
 <footer class="wrap">
@@ -573,7 +596,9 @@ footer{border-top:1px solid var(--line); padding:26px 0 60px; color:var(--muted)
 </footer>
 
 <script id="model-data" type="application/json">__DATA__</script>
+<script id="bets-data" type="application/json">__BEST_BETS__</script>
 <script>
+const B = JSON.parse(document.getElementById('bets-data').textContent);
 const D = JSON.parse(document.getElementById('model-data').textContent);
 const $ = s => document.querySelector(s);
 const el = (t,c,h) => { const n=document.createElement(t); if(c)n.className=c; if(h!==undefined)n.innerHTML=h; return n; };
@@ -581,6 +606,33 @@ const pct = v => (v*100).toFixed(1) + '%';
 const sign = v => (v>0?'+':'') + v.toFixed(1);
 const delta = (v, digits=2, suffix='') => v == null ? '—' : (v>0?'+':'')+v.toFixed(digits)+suffix;
 const css = n => getComputedStyle(document.documentElement).getPropertyValue(n).trim();
+function renderBets(){
+  const esc = s => String(s).replace(/[&<>"']/g, c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
+  const cents = n => (n*100).toFixed(1)+'¢';
+  const age = Date.now() - Date.parse(B.checked_at);
+  const today = new Intl.DateTimeFormat('en-CA',{timeZone:'America/New_York'}).format(new Date());
+  const gameDay = D.games.some(g => g.kickoff && new Intl.DateTimeFormat('en-CA',{timeZone:'America/New_York'}).format(new Date(g.kickoff))===today);
+  const fresh = B.status==='ok' && age>=-60000 && age <= (gameDay?75:420)*60000;
+  $('#betsFreshness').textContent = `${B.checked_at?'Markets checked '+new Date(B.checked_at).toLocaleString():'Markets not checked'} · ${B.model_at?'Model updated '+new Date(B.model_at).toLocaleString():''}${fresh?'':' · Refresh unavailable or overdue; candidates hidden.'}`;
+  $('#betsCoverage').textContent = `${B.matched_games||0} SEC matchups matched across ${B.events_scanned||0} college-football events scanned.`;
+  const rows = fresh ? (B.rows||[]).filter(r=>Date.parse(r.kickoff)>Date.now()) : [];
+  for(const [key,id] of [['mismatch','betsMismatch'],['good_buy','betsBuy']]){
+    const selected=rows.filter(r=>r[key]);
+    $('#'+id).innerHTML = selected.length ? selected.map(r=>`<article class="card" style="margin-bottom:14px">
+      <div class="sec-head"><h3>${esc(r.team)}</h3><a href="${esc(r.url)}" target="_blank" rel="noopener">View market ↗</a></div>
+      <p>${esc(r.away)} at ${esc(r.home)}${r.neutral?' · neutral site':''} · ${esc(new Date(r.kickoff).toLocaleString())}</p>
+      <div class="chips"><div class="chip"><span class="k">Model win chance</span><span class="v">${pct(r.model_probability)}</span></div>
+      <div class="chip"><span class="k">Market chance</span><span class="v">${pct(r.market_probability)}</span></div>
+      <div class="chip"><span class="k">Buy / sell now</span><span class="v">${cents(r.ask)} / ${cents(r.bid)}</span></div>
+      <div class="chip"><span class="k">Net model edge</span><span class="v">${(r.net_edge*100).toFixed(1)} pp</span></div></div>
+      ${key==='good_buy'?`<p><strong>Exit scenario: ${cents(r.target)}</strong> · Net gain ${cents(r.scenario_gain)}/share (${pct(r.scenario_return)}) if reached before kickoff. Last 24h: +${cents(r.change_24h)}.</p>`:''}
+      <p class="note">${Math.floor(r.ask_size)} shares offered at ask · ${Math.floor(r.bid_size)} shares bid · Entry incl. estimated fee ${cents(r.entry_cost)}/share. Market chance uses normalized bid/ask midpoints.</p>
+    </article>`).join('') : `<div class="card">${fresh?'No qualifying candidates in this scan. New game markets may not yet be listed.':'Waiting for a fresh market scan.'}</div>`;
+  }
+  $('#betsSkipped').textContent = `${(B.skipped||[]).length} contracts excluded (unmatched, started, unavailable, or unsupported).`;
+}
+renderBets();
+setInterval(renderBets,60000);
 const FEATURE_LABELS = {
   sp_overall_lag1:'Strength last season', sp_overall_lag3:'Strength three seasons back',
   sp_wavg3:'Three-year strength', recruit_points:'Current recruiting class',
@@ -610,7 +662,7 @@ $('#labNote').textContent = `Any two of the ${D.all_ratings.length} rated FBS te
 const generated = new Date(D.generated_at);
 const checked = new Date(D.data_source?.checked_at || D.generated_at);
 const stale = games.some(g=>!g.played) && Date.now()-checked.getTime() > 48*60*60*1000;
-$('#freshness').textContent = `Results checked ${checked.toLocaleString()} · ${(D.data_source?.provider || 'CFBD').toUpperCase()} · ${D.completed_games ?? games.filter(g=>g.played).length} finals. Refreshes every 6 hours, August–December. ${stale?'Results may be stale. ':''}Strength ratings are preseason.`;
+$('#freshness').textContent = `Results checked ${checked.toLocaleString()} · ${(D.data_source?.provider || 'CFBD').toUpperCase()} · ${D.completed_games ?? games.filter(g=>g.played).length} finals. Refresh target: every 6 hours; every 30 minutes on SEC game days. ${stale?'Results may be stale. ':''}Weekly outlooks use preseason strength; Best Bets uses the current in-season model.`;
 
 /* ---------------- tabs ---------------- */
 const tabs = [...document.querySelectorAll('nav button[data-tab]')];
