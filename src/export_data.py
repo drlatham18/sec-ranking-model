@@ -17,6 +17,7 @@ import build_dataset as BD
 import schedule_data
 import weekly
 import inseason
+import accuracy
 import national
 
 ROOT = pathlib.Path(__file__).resolve().parents[1]
@@ -197,6 +198,21 @@ def build(season=2026, conference="SEC", source="auto", refresh=False):
                                     detail)
     top25 = national_table[:25]
 
+    # --- week-by-week accuracy, each week scored with pre-kickoff ratings ---
+    weekly_accuracy = None
+    if cal_in and through_week:
+        season_games = [{"week": int(r.week) if pd.notna(r.week) else None,
+                         "home": r.home_team, "away": r.away_team,
+                         "home_points": None if pd.isna(r.home_points) else float(r.home_points),
+                         "away_points": None if pd.isna(r.away_points) else float(r.away_points),
+                         "neutral": bool(r.neutral), "completed": bool(r.completed)}
+                        for _, r in full.iterrows()]
+        weekly_accuracy = accuracy.weekly(
+            season_games, rmap, cal_in, cal,
+            conference_of=dict(zip(ratings.team, ratings.conference)),
+            conference=conference, source_info=source_info)
+        (OUT / "weekly_accuracy.json").write_text(json.dumps(weekly_accuracy, indent=1))
+
     oos = pd.read_csv(OUT / "oos_predictions.csv")
     explanation_path = OUT / ("explanations_%d.json" % season)
     explanations = json.loads(explanation_path.read_text()) \
@@ -251,6 +267,7 @@ def build(season=2026, conference="SEC", source="auto", refresh=False):
             .round(2).to_dict("records"),
         "n_sims": N_SIMS,
         "fcs_win_rate": {"p": round(p_fcs, 4), "n_games": n_fcs},
+        "weekly_accuracy": weekly_accuracy,
     }
     path = OUT / "app_data.json"
     # NaN is not valid JSON -- json.dumps emits a bare NaN token that
