@@ -262,6 +262,22 @@ Sample size is the thing to watch. Ten games cannot establish reliability -- a
 9/11 result has a 95% interval of roughly [0.48, 0.98]. The numbers above rest
 on 1,979 games precisely so they mean something.
 
+## Live accuracy, week by week
+
+`src/accuracy.py` scores every completed week from the first validated week
+(week 3) on. Each week is predicted with ratings rebuilt from **earlier weeks
+only**, exactly what the model knew at kickoff, so the result is honest even
+though the page later overwrites game probabilities with newer ratings. The
+in-season blend and preseason-only ratings are scored on the same FBS-vs-FBS
+games (accuracy, Brier, log loss, margin error, confidence tiers, conference
+subset, biggest misses).
+
+Missing data is flagged rather than dropped silently: scores not cross-checked
+by a second feed, score conflicts, unfinished games, games involving unrated
+(FCS) teams, and rated teams with no game in the feed. The export writes
+`output/weekly_accuracy.json`, embeds it as `weekly_accuracy`, and the Model Card
+shows it. It reuses the export's single schedule fetch: no extra CFBD request.
+
 ## Results and week-to-week comparisons
 
 The **Week to week** tab compares projected win totals, actual records, outlook
