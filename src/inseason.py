@@ -14,6 +14,9 @@ Method (all constants estimated, none assigned by hand -- see fit_inseason.py):
    This is opponent- and venue-adjusted, and lands on the same points scale as
    the preseason rating, so the two are directly blendable.
 
+   rating(opponent) is the opponent's own blended rating to date (a second
+   pass), not its frozen preseason value, when the calibration says so.
+
 2. A team's in-season rating is the mean of its implied ratings.
 
 3. Preseason and in-season are combined by shrinkage, so early noisy results
@@ -22,7 +25,9 @@ Method (all constants estimated, none assigned by hand -- see fit_inseason.py):
        weight = n / (n + K)
        blended = (1 - weight) * preseason + weight * in_season
 
-   K is chosen by leave-one-season-out log loss on development seasons only.
+   K is chosen by leave-one-season-out log loss on development seasons only:
+   the smallest K within K_TOLERANCE of the best, because results should
+   replace the preseason guess as fast as the evidence allows.
 
 Games against unrated (FCS) opponents carry no opponent rating and are skipped:
 a scoreless anchor would bias every team that played one.
@@ -90,7 +95,19 @@ def blend(ratings, implied, k):
 
 
 def current_ratings(games, ratings, calibration=None):
-    """Blended rating per team from the season's completed games."""
+    """Blended rating per team from the season's completed games.
+
+    With opponent_basis "current" each result is judged against the opponent's
+    blended rating to date rather than its preseason one, so losing to a team
+    that has proven much better than August's forecast is not scored as losing
+    to the August team. Older calibrations without the key keep the preseason
+    basis they were fitted with.
+    """
     c = calibration or load_calibration()
     implied = implied_ratings(games, ratings, c["scale_b1"], c["scale_hfa"])
-    return blend(ratings, implied, c["K"])
+    out = blend(ratings, implied, c["K"])
+    if c.get("opponent_basis") == "current":
+        opponents = {t: v["blended"] for t, v in out.items()}
+        implied = implied_ratings(games, opponents, c["scale_b1"], c["scale_hfa"])
+        out = blend(ratings, implied, c["K"])
+    return out

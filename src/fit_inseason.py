@@ -23,7 +23,11 @@ import inseason as IS
 
 ROOT = pathlib.Path(__file__).resolve().parents[1]
 OUT = ROOT / "output"
-K_GRID = (2, 3, 4, 5, 6, 8, 10, 14, 20)
+K_GRID = (1, 2, 3, 4, 5, 6, 8, 10, 14, 20)
+# Log-loss differences this small are noise across ~7k development games, so
+# among statistically tied K values the smallest (fastest to trust results
+# over the preseason forecast) wins.
+K_TOLERANCE = 0.001
 MIN_WEEK = 3          # weeks 1-2 have too little in-season evidence to compare
 # A straight-up pick on every game cannot reach a high accuracy: see the oracle
 # bound in the README. Accuracy on the games the model is CONFIDENT about is a
@@ -50,7 +54,42 @@ def load():
 
 
 def walk_forward(games, pre, k, b1, hfa):
-    """Blended home/away ratings for every game, using only earlier weeks."""
+    """Blended home/away ratings for every game, using only earlier weeks.
+
+    Mirrors inseason.current_ratings with opponent_basis "current": a first
+    pass blends against preseason opponent ratings, a second re-judges every
+    result against the opponent's first-pass rating.
+    """
+    rh = np.empty(len(games))
+    ra = np.empty(len(games))
+    for season in games.season.unique():
+        rows = games[games.season == season]
+        history = {}                              # team -> [(opponent, adjusted margin)]
+
+        def shrink(team, values):
+            base = pre[(season, team)]
+            n = len(values)
+            return base if not n else (1 - n / (n + k)) * base + (n / (n + k)) * sum(values) / n
+
+        for week in sorted(rows.week.unique()):
+            index = rows.index[rows.week == week]
+            first = {t: shrink(t, [pre[(season, o)] + x / b1 for o, x in h])
+                     for t, h in history.items()}
+            current = {t: shrink(t, [first.get(o, pre[(season, o)]) + x / b1 for o, x in h])
+                       for t, h in history.items()}
+            for i in index:                       # predict before folding week in
+                g = games.loc[i]
+                rh[i] = current.get(g.home_team, pre[(season, g.home_team)])
+                ra[i] = current.get(g.away_team, pre[(season, g.away_team)])
+            for i in index:
+                g = games.loc[i]
+                history.setdefault(g.home_team, []).append((g.away_team, g.margin - hfa * g.hf))
+                history.setdefault(g.away_team, []).append((g.home_team, -g.margin + hfa * g.hf))
+    return rh, ra
+
+
+def walk_forward_preseason_opponents(games, pre, k, b1, hfa):
+    """The previous method, kept for comparison: opponents at preseason strength."""
     rh = np.empty(len(games))
     ra = np.empty(len(games))
     for season in games.season.unique():
@@ -151,7 +190,8 @@ def main():
             n += m["n_games"]
         selection[k] = total / n
         print("  K=%-3d dev LOSO log loss = %.4f" % (k, selection[k]))
-    k_star = min(selection, key=selection.get)
+    best = min(selection.values())
+    k_star = min(k for k, v in selection.items() if v <= best + K_TOLERANCE)
     print("  -> K* = %d (holdout seasons untouched)" % k_star)
 
     # --- fit on development, score the holdout once -------------------------
@@ -167,8 +207,11 @@ def main():
 
     payload = {
         "method": "preseason rating shrunk toward opponent-adjusted in-season results",
+        "opponent_basis": "current",
         "K": k_star,
-        "K_selection": {"criterion": "leave-one-season-out log loss on development seasons",
+        "K_selection": {"criterion": "smallest K within tolerance of the best "
+                                     "leave-one-season-out log loss on development seasons",
+                        "tolerance": K_TOLERANCE,
                         "development_seasons": dev_seasons,
                         "log_loss_by_K": {str(a): b for a, b in selection.items()}},
         "scale_b1": b1_scale,
