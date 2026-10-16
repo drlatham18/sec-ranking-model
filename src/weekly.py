@@ -1,4 +1,4 @@
-"""Comparable weekly season outlooks using the same frozen preseason model."""
+"""Comparable weekly outlooks, optionally recalculated from as-of-week ratings."""
 import hashlib
 import numpy as np
 
@@ -58,19 +58,23 @@ def simulate(games, teams, n_sims=20000, through_week=None):
     return list(records.values())
 
 
-def history(games, teams, n_sims=20000):
+def history(games, teams, n_sims=20000, probabilities_at=None):
     """Reconstruct each closed SEC week; never label a partial week complete."""
+    def snapshot(cutoff):
+        scoped = probabilities_at(cutoff) if probabilities_at else games
+        return simulate(scoped, teams, n_sims, through_week=cutoff)
+
     snapshots = [{"week": -1, "label": "Preseason", "complete": True,
-                  "teams": simulate(games, teams, n_sims, through_week=-1)}]
+                  "teams": snapshot(-1)}]
     weeks = sorted({g["week"] for g in games})
     for week in weeks:
         through = [g for g in games if g["week"] <= week]
         if not all(g["played"] for g in through):
             break
         snapshots.append({"week": week, "label": f"Week {week}", "complete": True,
-                          "teams": simulate(games, teams, n_sims, through_week=week)})
+                          "teams": snapshot(week)})
     played_weeks = [g["week"] for g in games if g["played"]]
     if played_weeks and max(played_weeks) > snapshots[-1]["week"]:
         snapshots.append({"week": max(played_weeks), "label": "Current (partial week)",
-                          "complete": False, "teams": simulate(games, teams, n_sims)})
+                          "complete": False, "teams": snapshot(None)})
     return snapshots

@@ -12,7 +12,12 @@ from best_bets import get, stamp
 def due(model, now, event='schedule', scoreboard=None):
     if event != 'schedule' or (now.hour % 6 == 0 and now.minute < 30):
         return True
-    today = now.astimezone(ZoneInfo('America/New_York')).date()
+    local = now.astimezone(ZoneInfo('America/New_York'))
+    # Official availability reports change during the Wednesday-Friday buildup.
+    # Check hourly then, and every half hour on game days.
+    if 8 <= local.month <= 12 and local.weekday() in (2, 3, 4) and now.minute < 30:
+        return True
+    today = local.date()
     for game in model['games']:
         kickoff = stamp(game.get('kickoff'))
         day = kickoff.astimezone(ZoneInfo('America/New_York')).date() if kickoff else game.get('date')

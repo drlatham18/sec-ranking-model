@@ -304,6 +304,7 @@ footer{border-top:1px solid var(--line); padding:26px 0 60px; color:var(--muted)
 </header>
 
 <main class="wrap">
+  <p class="note" id="modelStatus" style="margin:16px 0"></p>
   <!-- ================= RANKING ================= -->
   <div class="panel" id="p-rank">
     <section>
@@ -321,7 +322,7 @@ footer{border-top:1px solid var(--line); padding:26px 0 60px; color:var(--muted)
           <thead><tr>
             <th>#</th><th>Team</th><th class="num">Rating</th>
             <th style="width:150px">Strength</th>
-            <th class="num">95% band</th>
+            <th class="num">Preseason 95% band</th>
             <th class="num">Proj W&ndash;L</th><th class="num">SEC W&ndash;L</th>
             <th class="num">Best record</th>
             <th style="width:120px">Win total</th>
@@ -382,7 +383,7 @@ footer{border-top:1px solid var(--line); padding:26px 0 60px; color:var(--muted)
         <label class="f"><span class="eyebrow">Through</span><select id="weeklySelect"></select></label>
       </div>
       <p class="prose">Outlook rank orders SEC teams by projected total wins. Final results update records,
-        projected wins, and best-record odds. Strength ratings remain the preseason forecast.</p>
+        projected wins, and best-record odds. Each week uses the strength ratings available then; later results never enter earlier snapshots.</p>
       <div class="tablewrap">
         <table id="weeklyTable">
           <thead><tr><th>Team</th><th class="num">Record</th><th class="num">Outlook rank</th>
@@ -412,13 +413,14 @@ footer{border-top:1px solid var(--line); padding:26px 0 60px; color:var(--muted)
           <h2 class="teamtitle" id="teamName"></h2>
           <div class="teamrating" id="teamRating"></div>
           <p class="prose" id="teamSummary"></p>
+          <div id="teamAvailability"></div>
           <div class="status" id="shareStatus" role="status" aria-live="polite"></div>
         </div>
         <div class="card"><dl class="kv" id="teamKV"></dl></div>
       </div>
       <div class="grid2">
         <div>
-          <div class="sec-head"><h2>Why this rating</h2></div>
+          <div class="sec-head"><h2>Preseason foundation</h2></div>
           <div class="card" id="driverList"></div>
         </div>
         <div>
@@ -436,6 +438,7 @@ footer{border-top:1px solid var(--line); padding:26px 0 60px; color:var(--muted)
         <h2>Matchup Lab</h2>
         <span class="note" id="labNote"></span>
       </div>
+      <div class="card" id="labAvailability" style="margin-bottom:18px"></div>
       <div class="lab">
         <div class="card">
           <label class="f"><span class="eyebrow">Team A</span><select id="selA"></select></label>
@@ -628,7 +631,8 @@ function renderBets(){
       <div class="chip"><span class="k">Model vs market</span><span class="v">${(r.model_gap*100).toFixed(1)} pp</span></div></div>
       ${key==='good_buy'?`<p><strong>Exit scenario: ${cents(r.target)}</strong> · Net gain ${cents(r.scenario_gain)}/share ${r.scenario_return==null?'':'('+pct(r.scenario_return)+')'} if reached before kickoff. Last 24h: ${r.change_24h==null?'Unavailable':(r.change_24h>0?'+':'')+cents(r.change_24h)}.</p>`:''}
       <p class="note">${Math.floor(r.ask_size)} shares offered at ask · ${Math.floor(r.bid_size)} shares bid · Entry incl. estimated fee ${cents(r.entry_cost)}/share. Market chance uses normalized bid/ask midpoints.</p>
-      <p class="note">${(r.notes||[]).map(esc).join(' · ')}</p>
+      <p class="note">${(r.notes||[]).map(esc).join(' · ')} · Model odds have no player-specific availability adjustment.</p>
+      <details><summary>Player availability</summary>${availabilityHTML(r.home,r.away)}</details>
     </article>`).join('') : `<div class="card">${rows.length?'No '+(key==='mismatch'?'winner disagreements':'prices below model probability')+' in the matched markets.':B.status==='ok'?'No upcoming SEC moneylines matched in this scan. See the matchups and coverage below.':'Market feed unavailable. Model matchups are shown below.'}</div>`;
   }
   $('#betsAll').innerHTML = rows.length?`<div class="tablewrap"><table><thead><tr><th>Team / matchup</th><th>Model</th><th>Market</th><th>Ask</th><th>Gap</th><th>Context</th></tr></thead><tbody>${rows.map(r=>`<tr><td>${esc(r.team)}<br><small>${esc(r.away)} at ${esc(r.home)}</small></td><td>${pct(r.model_probability)}</td><td>${pct(r.market_probability)}</td><td>${cents(r.ask)}</td><td>${(r.model_gap*100).toFixed(1)} pp</td><td>${(r.notes||[]).map(esc).join(' · ')||'—'}</td></tr>`).join('')}</tbody></table></div>`:'<p>No matched market prices yet. This does not mean the model agrees with the market; there is no comparable price in the current feed.</p>';
@@ -636,7 +640,6 @@ function renderBets(){
   $('#betsUpcoming').innerHTML = `<div class="tablewrap"><table><thead><tr><th>Matchup</th><th>Kickoff</th><th>Model winner</th><th>Win chance</th><th>Polymarket</th></tr></thead><tbody>${upcoming.map(g=>{const p=g.p_home_current;const winner=p==null?'Unavailable':p===.5?'Even':p>.5?g.home:g.away;const found=rows.some(r=>r.home===g.home&&r.away===g.away);return `<tr><td>${esc(g.away)} at ${esc(g.home)}${g.neutral?' (neutral)':''}</td><td>${esc(new Date(g.kickoff).toLocaleString())}</td><td>${esc(winner)}</td><td>${p==null?'—':pct(Math.max(p,1-p))}</td><td>${found?'Compared above':'Market not found / no comparable quote'}</td></tr>`;}).join('')}</tbody></table></div>`;
   $('#betsSkipped').innerHTML = `<p>${(B.skipped||[]).length} contracts could not be compared:</p><ul>${(B.skipped||[]).map(s=>`<li>${esc(s.event)} — ${esc(s.reason)}</li>`).join('')}</ul>`;
 }
-renderBets();
 setInterval(renderBets,60000);
 const FEATURE_LABELS = {
   sp_overall_lag1:'Strength last season', sp_overall_lag3:'Strength three seasons back',
@@ -650,14 +653,19 @@ const FEATURE_LABELS = {
 
 /* ---------------- header chips ---------------- */
 const V = D.validation, G = D.generated_from, C = D.calibration;
-const games = D.games.slice().sort((a,b) => (a.week||0)-(b.week||0) || a.home.localeCompare(b.home));
+const ACTIVE = D.inseason?.calibration || C;
+const currentRating = t => D.inseason ? t.current_rating : t.projected_rating;
+const games = D.games.map(g => ({...g,
+  p_home: D.inseason ? (g.p_home_current ?? g.p_home) : g.p_home,
+  margin_home: D.inseason ? g.margin_home_current : g.margin_home
+})).slice().sort((a,b) => (a.week||0)-(b.week||0) || a.home.localeCompare(b.home));
 const base = V.by_config.baseline_prior_year_only.rmse;
 const gain = (1 - V.oos_rmse/base) * 100;
 $('#chips').innerHTML = [
-  ['Holdout error', V.oos_rmse.toFixed(2)+' pts'],
+  ['Preseason error', V.oos_rmse.toFixed(2)+' pts'],
   ['vs baseline', '−'+gain.toFixed(1)+'%'],
   ['Inputs kept', G.n_features],
-  ['Home field', C.home_field_advantage.toFixed(2)+' pts'],
+  ['Home field', ACTIVE.home_field_advantage.toFixed(2)+' pts'],
   ['Results through', D.current_period || D.snapshot_type],
 ].map(([k,v]) => `<div class="chip"><span class="k">${k}</span><span class="v">${v}</span></div>`).join('');
 $('#ftTrained').textContent = G.trained_through;
@@ -666,9 +674,26 @@ $('#nGames').textContent = C.n_games.toLocaleString();
 $('#labNote').textContent = `Any two of the ${D.all_ratings.length} rated FBS teams. Neutral field by default.`;
 const generated = new Date(D.generated_at);
 const checked = new Date(D.data_source?.checked_at || D.generated_at);
-const stale = games.some(g=>!g.played) && Date.now()-checked.getTime() > 48*60*60*1000;
-$('#freshness').textContent = `Results checked ${checked.toLocaleString()} · ${(D.data_source?.provider || 'CFBD').toUpperCase()} · ${D.completed_games ?? games.filter(g=>g.played).length} finals. Refresh target: every 6 hours; every 30 minutes on SEC game days. ${stale?'Results may be stale. ':''}Weekly outlooks use preseason strength; Best Bets uses the current in-season model.`;
+const stale = games.some(g=>!g.played) && Date.now()-checked.getTime() > 7*60*60*1000;
+$('#freshness').textContent = `Results checked ${checked.toLocaleString()} · ${(D.data_source?.provider || 'CFBD').toUpperCase()} · ${D.completed_games ?? games.filter(g=>g.played).length} finals. Refresh target: every 6 hours; hourly Wednesday–Friday in season; every 30 minutes on SEC game days. ${stale?'Results may be stale. ':''}All forward-looking views use ${D.inseason?'current strength from completed results':'preseason strength (no results yet)'}. Availability reports do not yet change the numerical forecast.`;
 
+$('#modelStatus').textContent = `${stale?'Refresh overdue. ':''}${D.inseason?'Ratings incorporate completed games through week '+D.inseason.through_week:'Preseason ratings: no completed results incorporated'}. Player availability is shown separately; numerical odds do not include a player-specific adjustment.`;
+const escapeText = s => String(s).replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
+function availabilityHTML(a,b){
+  const feed=D.availability;
+  const next=D.games.filter(g=>!g.played && Date.parse(g.kickoff)>Date.now() &&
+    ((g.home===a&&g.away===b)||(g.home===b&&g.away===a))).sort((x,y)=>Date.parse(x.kickoff)-Date.parse(y.kickoff))[0];
+  const date=next?.kickoff ? new Intl.DateTimeFormat('en-CA',{timeZone:'America/New_York'}).format(new Date(next.kickoff)) : null;
+  const report=(feed?.reports||[]).filter(r=>r.date===date && r.teams.some(t=>t.team===a)&&r.teams.some(t=>t.team===b)).sort((x,y)=>Date.parse(y.published_at)-Date.parse(x.published_at))[0];
+  const link='<a href="https://www.secsports.com/fbreports" target="_blank" rel="noopener">Official SEC availability report ↗</a>';
+  if(!report) return `<p>${link}</p><p>No verified report for this matchup and game date. Availability is unknown; no player adjustment is applied.</p>`;
+  const overdue=Date.now()-Date.parse(feed.checked_at)>7*3600000;
+  return `<p>${link} · Game ${escapeText(report.date)} · Published ${escapeText(new Date(report.published_at).toLocaleString())}</p><p>${overdue?'Report refresh overdue. ':''}Checked ${escapeText(new Date(feed.checked_at).toLocaleString())}. Reported absences may already affect past results; no additional point deduction is applied.</p>`+report.teams.map(t=>{
+    const players=t.players.filter(p=>p.status!=='Available');
+    return `<h3>${escapeText(t.team)}</h3>`+(players.length?`<ul>${players.map(p=>`<li>${escapeText(p.name)} — ${escapeText(p.status)}</li>`).join('')}</ul>`:'<p>No unavailable players listed in this report.</p>');
+  }).join('');
+}
+renderBets();
 /* ---------------- tabs ---------------- */
 const tabs = [...document.querySelectorAll('nav button[data-tab]')];
 function activateTab(name, updateUrl=true){
@@ -713,9 +738,11 @@ $('#themeBtn').addEventListener('click', () => {
 });
 
 /* ---------------- ranking ---------------- */
-const teams = D.teams;
+const nationalRanks = Object.fromEntries((D.national_ranking||[]).map(t=>[t.team,t.rank]));
+const teams = D.teams.map(t=>({...t,national_rank:nationalRanks[t.team]||t.national_rank})).sort((a,b)=>currentRating(b)-currentRating(a));
+teams.forEach((t,i)=>t.conf_rank=i+1);
 const secByName = Object.fromEntries(teams.map(t => [t.team,t]));
-const universe = D.all_ratings.map(t => ({...t,...(secByName[t.team]||{})}));
+const universe = D.all_ratings.map(t => ({...t,...(secByName[t.team]||{}),national_rank:nationalRanks[t.team]||t.national_rank})).sort((a,b)=>currentRating(b)-currentRating(a));
 
 function spark(dist){
   const mx=Math.max(...dist)||1;
@@ -726,20 +753,20 @@ const tb = $('#rankTable tbody');
 function renderRanking(){
   const view=$('#rankView').value;
   const rows=view==='SEC' ? teams : (view==='top25' ? universe.slice(0,25) : universe);
-  const maxR = Math.max(...rows.map(t => t.projected_rating));
-  const minR = Math.min(...rows.map(t => t.projected_rating), 0);
-  $('#rankTitle').textContent = `${D.season} ${view==='SEC'?'SEC':view==='top25'?'National Top 25':'FBS'} projected ranking`;
-  $('#rankNote').textContent = `${rows.length} teams · untouched holdout ±95% band is ±${(1.96*V.oos_rmse).toFixed(1)} pts`;
+  const maxR = Math.max(...rows.map(t => currentRating(t)));
+  const minR = Math.min(...rows.map(t => currentRating(t)), 0);
+  $('#rankTitle').textContent = `${D.season} ${view==='SEC'?'SEC':view==='top25'?'National Top 25':'FBS'} current ranking`;
+  $('#rankNote').textContent = `${rows.length} teams · preseason-only ±95% band is ±${(1.96*V.oos_rmse).toFixed(1)} pts`;
   tb.innerHTML='';
   rows.forEach((t,i) => {
-  const frac = (t.projected_rating - minR) / (maxR - minR || 1);
+  const frac = (currentRating(t) - minR) / (maxR - minR || 1);
   const cls = (t.p_conf_leader||0) >= .15 ? 'hi' : (t.p_conf_leader||0) >= .05 ? 'mid' : 'lo';
   const hasSeason = t.proj_wins != null;
   const tr = el('tr');
   tr.innerHTML = `
     <td class="rk">${view==='SEC'?t.conf_rank:t.national_rank||i+1}</td>
     <td class="team">${t.team}</td>
-    <td class="num mono">${t.projected_rating.toFixed(1)}</td>
+    <td class="num mono">${currentRating(t).toFixed(1)}</td>
     <td><span class="bar"><i style="width:${(frac*100).toFixed(1)}%"></i></span></td>
     <td class="num mono" style="color:var(--muted)">${t.lo_95.toFixed(0)} – ${t.hi_95.toFixed(0)}</td>
     <td class="num mono">${hasSeason?t.proj_wins.toFixed(1)+'–'+((t.scheduled_games??12)-t.proj_wins).toFixed(1):'—'}${hasSeason&&t.wins!=null?`<br><small style="color:var(--muted)">${t.wins}–${t.losses} actual · ${delta(t.change_proj_wins)} wins</small>`:''}</td>
@@ -831,7 +858,7 @@ if(!NAT.length){
 
 /* ---------------- matchup lab ---------------- */
 const all = D.all_ratings.slice().sort((a,b) => a.team.localeCompare(b.team));
-const rate = Object.fromEntries(all.map(t => [t.team, t.projected_rating]));
+const rate = Object.fromEntries(all.map(t => [t.team, currentRating(t)]));
 const confOf = Object.fromEntries(all.map(t => [t.team, t.conference]));
 function fill(sel, def){
   sel.innerHTML = all.map(t => `<option value="${t.team}">${t.team}${t.conference?' · '+t.conference:''}</option>`).join('');
@@ -849,17 +876,21 @@ function renderTeam(){
   const t=universe.find(x=>x.team===name);
   const ex=D.explanations[name]||{drivers:[]};
   if(!t) return;
+  const upcoming=games.find(g=>!g.played && Date.parse(g.kickoff)>Date.now() && (g.home===name||g.away===name));
+  $('#teamAvailability').innerHTML=upcoming?availabilityHTML(upcoming.home,upcoming.away):'<p>No upcoming availability report matched.</p>';
   $('#teamConference').textContent=t.conference||'FBS';
   $('#teamName').textContent=t.team;
-  $('#teamRating').textContent=`${t.projected_rating.toFixed(1)} rating · No. ${t.national_rank} nationally`;
+  $('#teamRating').textContent=`${currentRating(t).toFixed(1)} rating · No. ${t.national_rank} nationally`;
   $('#teamSummary').textContent=t.proj_wins!=null
     ? `Most likely outlook: ${t.proj_wins.toFixed(1)} wins, ${t.proj_conf_wins.toFixed(1)} in conference, with a ${pct(t.p_conf_leader)} share of the best SEC record.`
-    : `Projected strength is ${t.projected_rating>=0?'above':'below'} an average FBS team, with uncertainty shown explicitly rather than hidden behind a single rank.`;
+    : `Projected strength is ${currentRating(t)>=0?'above':'below'} an average FBS team, with uncertainty shown explicitly rather than hidden behind a single rank.`;
   $('#teamKV').innerHTML=[
     ['National rank', '#'+t.national_rank],
-    ['Projected rating', sign(t.projected_rating)],
-    ['68% interval', `${t.lo_68.toFixed(1)} to ${t.hi_68.toFixed(1)}`],
-    ['95% interval', `${t.lo_95.toFixed(1)} to ${t.hi_95.toFixed(1)}`],
+    ['Current rating', sign(currentRating(t))],
+    ['Preseason rating', sign(t.projected_rating)],
+    ['Change from results', sign(currentRating(t)-t.projected_rating)],
+    ['Preseason 68% interval', `${t.lo_68.toFixed(1)} to ${t.hi_68.toFixed(1)}`],
+    ['Preseason 95% interval', `${t.lo_95.toFixed(1)} to ${t.hi_95.toFixed(1)}`],
     ['Projected wins', t.proj_wins!=null?t.proj_wins.toFixed(1):'SEC schedule model only'],
     ['Current record', t.wins!=null?`${t.wins}–${t.losses}`:'—'],
     ['Change vs '+(D.comparison_period||'previous week'), delta(t.change_proj_wins)+' projected wins'],
@@ -871,7 +902,7 @@ function renderTeam(){
       <span class="drivertrack"><i style="${pos?`left:50%;width:${w}%;background:var(--good)`:`right:50%;width:${w}%;background:var(--bad)`}"></i></span>
       <span class="mono" style="text-align:right">${sign(d.points)}</span></div>`;
   }).join('') || '<p class="note">No driver breakdown is available.</p>';
-  const tg=games.filter(g=>g.home===name||g.away===name).slice(0,6);
+  const tg=games.filter(g=>g.home===name||g.away===name).sort((a,b)=>Number(a.played)-Number(b.played)||(a.week-b.week)).slice(0,6);
   $('#teamGames').innerHTML=tg.map(g=>{
     const home=g.home===name,opp=home?g.away:g.home,p=home?g.p_home:1-g.p_home;
     return `<div class="driverrow"><span><strong>${opp}</strong><br><small style="color:var(--muted)">Week ${g.week} · ${g.neutral?'neutral':home?'home':'away'}</small></span>
@@ -908,8 +939,8 @@ $('#selB').addEventListener('change', update);
 
 function calc(a, b, site){
   const hf = site==='neutral' ? 0 : (site==='a' ? 1 : -1);
-  const margin = C.rating_diff_coef*(rate[a]-rate[b]) + C.home_field_advantage*hf;
-  const gsd = site==='neutral' ? C.neutral_residual_sd : C.residual_sd;
+  const margin = ACTIVE.rating_diff_coef*(rate[a]-rate[b]) + ACTIVE.home_field_advantage*hf;
+  const gsd = D.inseason ? ACTIVE.residual_sd : (site==='neutral' ? C.neutral_residual_sd : C.residual_sd);
   const sd = gsd;
   return {margin, sd, gsd, p: normcdf(margin/sd)};
 }
@@ -923,6 +954,7 @@ let cur = null;
 function update(){
   const a = $('#selA').value, b = $('#selB').value;
   if(a === b){ $('#labLine').textContent = 'Pick two teams'; $('#labSub').textContent=''; return; }
+  $('#labAvailability').innerHTML=availabilityHTML(a,b);
   const r = calc(a,b,site); cur = {a,b,...r};
   const favA = r.margin >= 0;
   const fav = favA ? a : b, p = favA ? r.p : 1-r.p;
@@ -937,10 +969,11 @@ function update(){
     [`${a} rating`, rate[a].toFixed(1)],
     [`${b} rating`, rate[b].toFixed(1)],
     ['Rating gap', sign(rate[a]-rate[b])],
-    ['Home field applied', site==='neutral' ? '—' : sign(site==='a'?C.home_field_advantage:-C.home_field_advantage)],
+    ['Fitted rating multiplier', ACTIVE.rating_diff_coef.toFixed(3)],
+    ['Home field applied', site==='neutral' ? '—' : sign(site==='a'?ACTIVE.home_field_advantage:-ACTIVE.home_field_advantage)],
     ['Projected margin (A)', sign(r.margin)],
     ['Single-game SD', r.gsd.toFixed(1)],
-    ['Total preseason SD', r.sd.toFixed(1)],
+    ['Rating basis', D.inseason?'Current results blend':'Preseason'],
   ].map(([k,v]) => `<dt>${k}</dt><dd>${v}</dd>`).join('');
   $('#distNote').textContent =
     `Curve is the fitted margin distribution for ${a}. Shaded area is the ${pct(r.p)} chance ${a} wins.`;
@@ -1011,7 +1044,7 @@ function paintGrid(){
     h += `<tr><th class="side">${a}</th>`;
     for(const b of names){
       if(a===b){ h += '<td class="self">—</td>'; continue; }
-      const p = D.neutral_grid[a][b];
+      const p = (D.current_grid || D.neutral_grid)[a][b];
       h += `<td style="${heat(p)}">${(p*100).toFixed(0)}</td>`;
     }
     h += '</tr>';
@@ -1054,9 +1087,9 @@ function renderSched(){
       <td class="mono" style="color:var(--muted)">${g.date ?? ''}</td>
       <td><strong>${g.away}</strong> at <strong>${g.home}</strong>${g.conf_game?' <span class="pill lo">SEC</span>':''}</td>
       <td style="color:var(--muted)">${siteTxt}</td>
-      <td class="num mono">${g.margin_home==null?'Unrated opponent':fav+' −'+Math.abs(g.margin_home).toFixed(1)}</td>
-      <td class="num mono">${(p*100).toFixed(0)}%</td>
-      <td><span class="bar" title="${g.home} ${pa.toFixed(0)}%"><i style="width:${pa.toFixed(1)}%;background:${pa>=50?'var(--good)':'var(--bad)'}"></i></span></td>
+      <td class="num mono">${g.played?'—':g.margin_home==null?'Unrated opponent':fav+' −'+Math.abs(g.margin_home).toFixed(1)}</td>
+      <td class="num mono">${g.played?'—':(p*100).toFixed(0)+'%'}</td>
+      <td><span class="bar" title="${g.home} ${pa.toFixed(0)}%"><i style="width:${g.played?0:pa.toFixed(1)}%;background:${pa>=50?'var(--good)':'var(--bad)'}"></i></span></td>
       <td class="mono">${result}</td>`;
     tb.appendChild(tr);
   }
@@ -1118,8 +1151,13 @@ $('#bySeason tbody').innerHTML = V.by_season.map(s =>
    <td class="num mono">${s.spearman.toFixed(3)}</td><td class="num mono">${s.n_test}</td></tr>`).join('');
 
 $('#calKV').innerHTML = [
-  ['Rating-difference slope', C.rating_diff_coef.toFixed(3)],
-  ['Home-field advantage', C.home_field_advantage.toFixed(2) + ' pts'],
+  ['Forecast basis', D.inseason?'Current results blend':'Preseason'],
+  ['Current rating multiplier', ACTIVE.rating_diff_coef.toFixed(3)],
+  ['Current home-field advantage', ACTIVE.home_field_advantage.toFixed(2)+' pts'],
+  ['Current game SD', ACTIVE.residual_sd.toFixed(2)+' pts'],
+  ['Player-specific adjustment', 'Not calibrated'],
+  ['Preseason rating-difference slope', C.rating_diff_coef.toFixed(3)],
+  ['Preseason home-field advantage', C.home_field_advantage.toFixed(2) + ' pts'],
   ['Constant term', 'fixed at 0'],
   ['Single-game SD (home/away)', C.residual_sd.toFixed(2) + ' pts'],
   ['Single-game SD (neutral)', C.neutral_residual_sd.toFixed(2) + ' pts'],

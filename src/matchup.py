@@ -42,6 +42,17 @@ def _load(season=None):
         if not path.exists():
             raise SystemExit("Run: python src/rank.py %d" % season)
     ratings = pd.read_csv(path)
+    snapshot = OUT / "app_data.json"
+    if snapshot.exists():
+        live = json.loads(snapshot.read_text())
+        if live.get("season") == season and live.get("inseason"):
+            values = {r["team"]: r.get("current_rating") for r in live["all_ratings"]}
+            if any(values.get(t) is None for t in ratings.team):
+                raise ValueError("Current rating missing; refresh the model export")
+            ratings["projected_rating"] = ratings.team.map(values)
+            calib = dict(live["inseason"]["calibration"])
+            calib.update(intercept=0.0, neutral_residual_sd=calib["residual_sd"],
+                         method="current results blend", results_checked_at=live["data_source"].get("checked_at"))
     proj_rmse = float(sel["performance_claim"]["rmse"])
     return season, ratings, calib, proj_rmse
 
@@ -80,7 +91,7 @@ def matchup(team_a, team_b, home=None, season=None, include_projection_error=Tru
     sd = game_sd
     # New calibrations are fit directly on historical walk-forward preseason
     # ratings, so their residual already contains projection uncertainty.
-    if include_projection_error and c.get("method") != "walk-forward preseason predictions":
+    if include_projection_error and c.get("method") not in ("walk-forward preseason predictions", "current results blend"):
         # two independently projected ratings, propagated through b1
         sd = math.sqrt(game_sd ** 2
                        + 2.0 * (c["rating_diff_coef"] * proj_rmse) ** 2)
@@ -94,6 +105,8 @@ def matchup(team_a, team_b, home=None, season=None, include_projection_error=Tru
         "win_prob_a": round(p_a, 4), "win_prob_b": round(1 - p_a, 4),
         "sd_used": round(sd, 2), "game_sd": round(game_sd, 2),
         "projection_rmse": round(proj_rmse, 2),
+        "availability_adjusted": False,
+        "results_checked_at": c.get("results_checked_at"),
         "calibration_method": c.get("method", "final-season ratings"),
     }
 
@@ -108,7 +121,7 @@ def fmt(r):
         "  projected: %s by %.1f\n"
         "  win prob : %s %.1f%%   |   %s %.1f%%\n"
         "  ratings  : %s %.1f, %s %.1f\n"
-        "  spread SD: %.1f pts (calibrated directly from preseason forecasts)"
+        "  spread SD: %.1f pts (fitted game uncertainty; no player-specific adjustment)"
         % (r["team_a"], r["team_b"], r["site"], r["season"],
            fav, line, fav, p * 100, dog, (1 - p) * 100,
            r["team_a"], r["rating_a"], r["team_b"], r["rating_b"],

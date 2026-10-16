@@ -18,6 +18,7 @@ import schedule_data
 import weekly
 import inseason
 import national
+import availability
 
 ROOT = pathlib.Path(__file__).resolve().parents[1]
 OUT = ROOT / "output"
@@ -68,19 +69,14 @@ def build(season=2026, conference="SEC", source="auto", refresh=False):
     # strength that includes the season actually being played.
     played = sched[sched.completed]
     through_week = int(played.week.max()) if len(played) else 0
-    strength = None
-    try:
-        cal_in = inseason.load_calibration()
-        if through_week:
-            fbs = full[full.completed]
-            results = [{"home": r.home_team, "away": r.away_team,
-                        "home_points": r.home_points, "away_points": r.away_points,
-                        "neutral": bool(r.neutral)} for _, r in fbs.iterrows()]
-            strength = inseason.current_ratings(results, rmap, cal_in)
-    except (FileNotFoundError, ValueError) as error:
-        print("[export] in-season blend unavailable (%s); preseason only" % error)
-        cal_in = None
-    cmap = {t: v["blended"] for t, v in strength.items()} if strength else {}
+    # A live export must never silently fall back to preseason strength.
+    cal_in = inseason.load_calibration()
+    fbs = full[full.completed]
+    results = [{"home": r.home_team, "away": r.away_team,
+                "home_points": r.home_points, "away_points": r.away_points,
+                "neutral": bool(r.neutral)} for _, r in fbs.iterrows()]
+    strength = inseason.current_ratings(results, rmap, cal_in) if len(fbs) else None
+    cmap = {t: round(v["blended"], 2) for t, v in strength.items()} if strength else {}
 
     game_sd_n = cal["neutral_residual_sd"]
     game_sd_h = cal["residual_sd"]
@@ -135,11 +131,29 @@ def build(season=2026, conference="SEC", source="auto", refresh=False):
             "away_points": None if pd.isna(r.away_points) else int(r.away_points),
         })
 
-    # Each weekly comparison uses identical ratings, probabilities, and random
-    # draws. Only games that are final by that week become fixed outcomes.
+    # Recompute forecasts at each cutoff using only then-known FBS results.
+    # Today's ratings must never leak into historical weekly comparisons.
     teams = sorted(sec_teams)
-    sim = weekly.simulate(games, teams, N_SIMS)
-    weekly_history = weekly.history(games, teams, N_SIMS)
+    def probabilities_at(cutoff):
+        if cutoff == -1:
+            return games
+        known = full[full.completed] if cutoff is None else full[full.completed & (full.week <= cutoff)]
+        evidence = [{"home": r.home_team, "away": r.away_team,
+                     "home_points": r.home_points, "away_points": r.away_points,
+                     "neutral": bool(r.neutral)} for _, r in known.iterrows()]
+        if not evidence:
+            return games
+        asof = {t: round(v["blended"], 2) for t, v in inseason.current_ratings(evidence, rmap, cal_in).items()}
+        scoped = []
+        for g in games:
+            row = dict(g)
+            if not g["unrated"]:
+                m = cal_in["rating_diff_coef"] * (asof[g["home"]] - asof[g["away"]]) + cal_in["home_field_advantage"] * (0 if g["neutral"] else 1)
+                row["p_home"] = float(norm.cdf(m / cal_in["residual_sd"]))
+            scoped.append(row)
+        return scoped
+    sim = weekly.simulate(probabilities_at(None), teams, N_SIMS)
+    weekly_history = weekly.history(games, teams, N_SIMS, probabilities_at)
     current = weekly_history[-1]
     previous = weekly_history[-2] if len(weekly_history) > 1 else None
     previous_teams = {t["team"]: t for t in previous["teams"]} if previous else {}
@@ -201,6 +215,18 @@ def build(season=2026, conference="SEC", source="auto", refresh=False):
     explanation_path = OUT / ("explanations_%d.json" % season)
     explanations = json.loads(explanation_path.read_text()) \
         if explanation_path.exists() else {}
+    # Public default fields carry the current forecast too, so consumers do not
+    # have to know a second field name to avoid the original preseason bug.
+    for game in games:
+        game["p_home_preseason"] = game["p_home"]
+        game["margin_home_preseason"] = game["margin_home"]
+        game["sd_preseason"] = game["sd"]
+        if strength:
+            game["p_home"] = game["p_home_current"]
+            game["margin_home"] = game["margin_home_current"]
+            game["sd"] = game["sd_current"]
+        game["forecast_basis"] = "current results blend" if strength else "preseason"
+        game["availability_adjusted"] = False
     payload = {
         "season": season,
         "conference": conference,
@@ -212,8 +238,8 @@ def build(season=2026, conference="SEC", source="auto", refresh=False):
         "current_period": current["label"],
         "comparison_period": previous["label"] if previous else None,
         "weekly_history": weekly_history,
-        "history_method": "Reconstructed from fixed preseason ratings and each week's final results; future results are excluded.",
-        "rating_basis": "Frozen preseason strength; results update records and season outlook, not strength ratings.",
+        "history_method": "Reconstructed using opponent-adjusted results available at each week; future results and current availability reports are excluded.",
+        "rating_basis": "Current strength blends the preseason forecast with completed results. Availability is reported separately; player-specific point adjustments are not yet calibrated.",
         "generated_from": {
             "target": sel["target"],
             "winner": sel["winner"],
@@ -234,6 +260,7 @@ def build(season=2026, conference="SEC", source="auto", refresh=False):
         "coefficients": sel["standardized_coefficients"],
         "block_ablation": sel["block_ablation"],
         "calibration": cal,
+        "availability": availability.fetch_reports(),
         "teams": sec.round(3).to_dict("records"),
         "all_ratings": ratings.round(2).to_dict("records"),
         "games": games,
@@ -241,7 +268,8 @@ def build(season=2026, conference="SEC", source="auto", refresh=False):
         "national_ranking": national_table,
         "top25_basis": "current_rating" if cmap else "preseason_rating",
         "ranking_through_week": through_week,
-        "neutral_grid": grid,
+        "neutral_grid": current_grid or grid,
+        "preseason_neutral_grid": grid,
         "current_grid": current_grid,
         "inseason": ({"calibration": cal_in,
                       "through_week": through_week,

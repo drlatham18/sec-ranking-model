@@ -28,7 +28,7 @@ per-contract reasons explain missing comparisons.
 The existing Pages workflow checks every 30 minutes and deploys every six hours
 normally, or every half hour on SEC game days in America/New_York. Its gate checks
 the stored schedule plus ESPN for reschedules. GitHub schedules are best effort
-and can be delayed. Results and market prices refresh; the preseason fit does not
+and can be delayed. Results, current strength, availability reports and market prices refresh; the preseason fit does not
 retrain. No second scheduler or trading runner is created.
 
 A preseason team-strength model for SEC football. Every weight in it is
@@ -267,9 +267,10 @@ on 1,979 games precisely so they mean something.
 The **Week to week** tab compares projected win totals, actual records, outlook
 rank (ordered by projected total wins), and best-SEC-record odds against the
 previous completed week. An unfinished week is explicitly labeled partial.
-Strength ratings remain the fitted preseason forecast; this does not introduce
-an unvalidated in-season strength model. Weekly history is reconstructed with
-the same preseason ratings and only the results final by each week's cutoff.
+Each weekly snapshot reconstructs the validated in-season blend using only
+results final by that week's cutoff. Current Matchup Lab, Team Lens, Neutral Grid,
+schedule forecasts, season simulations, CLI, and market comparisons use the
+current ratings and corresponding game calibration.
 Expected wins are calculated directly from probabilities; stable per-game
 simulation draws prevent refresh noise from appearing as weekly movement.
 
@@ -337,3 +338,28 @@ Use the Share button to copy the current view. A weekly link with an explicit
 latest week automatically. The season rolls over when a new preseason model is
 built and the workflow's export season is updated; scheduled score refreshes do
 not refit ratings or silently switch seasons.
+
+## Current forecasts and player availability
+
+Every forward-looking view uses the validated results blend once completed games
+exist. Preseason ratings remain the prior and are explicitly labeled wherever
+they are shown. Missing in-season calibration fails the export instead of quietly
+publishing preseason predictions. Weekly outlooks are recomputed independently
+at each cutoff, without leaking future scores into earlier snapshots.
+
+`src/availability.py` reads the same public SEC/HD Intelligence report endpoint
+used by https://www.secsports.com/fbreports. Matchup Lab, Team Lens and market
+cards show report publication and retrieval times and match both teams and game
+date. Missing, failed or unmatched reports mean unknown availability. Exempt
+roster entries are excluded. Reports cover SEC reporting, not every FBS matchup.
+
+**Player availability is context, not a calibrated numerical injury adjustment.**
+No point value is invented for a missing player. Long-term absences can already
+affect the completed results entering the rating; automatically deducting again
+would double-count them. Player/replacement value and historical as-of injury
+reports are needed before numerical adjustments can be validated.
+
+Refreshes run every six hours, hourly Wednesday–Friday during August–December,
+and every half hour on SEC game dates. Schedule triggers are best effort. The
+page warns after seven hours without a results refresh. ESPN requests run with
+six workers; any failed required request still rejects the incomplete export.

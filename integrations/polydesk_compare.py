@@ -25,15 +25,16 @@ def list_value(value):
 
 
 def estimate(model, home, away, neutral=False):
-    ratings = {r['team']: float(r['projected_rating']) for r in model['all_ratings']}
-    c = model['calibration']
-    if c.get('method') != 'walk-forward preseason predictions':
+    live = model.get('inseason')
+    ratings = {r['team']: float(r['current_rating'] if live else r['projected_rating']) for r in model['all_ratings']}
+    c = live['calibration'] if live else model['calibration']
+    if not live and c.get('method') != 'walk-forward preseason predictions':
         raise ValueError('Unrecognized probability calibration')
     if home == away or home not in ratings or away not in ratings:
         raise ValueError('Both distinct teams must have model ratings')
     margin = c['rating_diff_coef'] * (ratings[home] - ratings[away])
     if not neutral: margin += c['home_field_advantage']
-    sd = c['neutral_residual_sd'] if neutral else c['residual_sd']
+    sd = c['neutral_residual_sd'] if neutral and not live else c['residual_sd']
     if not math.isfinite(margin) or not math.isfinite(sd) or sd <= 0: raise ValueError('Invalid calibration spread')
     p = .5 * (1 + math.erf(margin / sd / math.sqrt(2)))
     return {home: p, away: 1-p}
@@ -92,9 +93,10 @@ def compare(model, run, now=None, target_venue='polymarket_us'):
     common=[]
     if not stamp or not -60 <= (now-stamp).total_seconds() <= 900: common.append('market_snapshot_stale_or_undated')
     if not model_stamp or not 0 <= (now-model_stamp).total_seconds() <= 7*86400: common.append('model_snapshot_stale_or_undated')
-    if model.get('snapshot_type') != 'preseason': common.append('unknown_model_snapshot_type')
+    if model.get('snapshot_type') not in ('preseason', 'live'): common.append('unknown_model_snapshot_type')
     # A preseason projection is a baseline; it does not incorporate new-season results.
-    common.append('preseason_only_current_form_unverified')
+    if not model.get('inseason'): common.append('preseason_only_current_form_unverified')
+    common.append('player_availability_not_numerically_adjusted')
     source_venue='polymarket_global'
     if target_venue!=source_venue: common.append('research_execution_venue_mismatch')
     common.append('out_of_sample_profitability_unverified')

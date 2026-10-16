@@ -4,6 +4,7 @@ CFBD remains the preferred source when its server-side key is configured.
 ESPN's public scoreboard provides a keyless SEC schedule/results fallback.
 """
 from datetime import datetime, timezone
+from concurrent.futures import ThreadPoolExecutor
 import pathlib
 import os
 import re
@@ -91,9 +92,15 @@ def espn_get(season, week, group=8):
 def espn_week_rows(season, groups=(8,), weeks=ESPN_WEEKS):
     """Merge the requested conference groups and weeks into one schedule."""
     rows = []
-    for group in groups:
-        for week in weeks:
-            rows.extend(espn_rows(espn_get(season, week, group), season))
+    queries = [(group, week) for group in groups for week in weeks]
+    def read(query):
+        group, week = query
+        return espn_rows(espn_get(season, week, group), season)
+    # Bounded parallel reads keep a full-FBS refresh within the deployment timeout.
+    # map preserves order and propagates failures; partial feeds are never published.
+    with ThreadPoolExecutor(max_workers=6) as pool:
+        for batch in pool.map(read, queries):
+            rows.extend(batch)
     return rows
 
 
