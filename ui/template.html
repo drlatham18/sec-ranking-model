@@ -1066,6 +1066,24 @@ function paintGrid(){
 }
 paintGrid();
 
+
+function victoryKeys(g,team){
+ const other=g.home===team?g.away:g.home;
+ const p=g.home===team?g.p_home:1-g.p_home;
+ const examples={
+  'Tennessee|South Carolina':['Establish the run and create manageable passing downs.','Contain LaNorris Sellers without abandoning coverage.','Use quick passes and protection help to prevent disruptive pressure.'],
+  'South Carolina|Tennessee':['Control Tennessee’s early-down rushing attack and force passing situations.','Feature Sellers in the designed run game to challenge defensive run fits.','Use motion and formation variation to test Tennessee’s defensive communication.']
+ };
+ const specific=examples[team+'|'+other];
+ const keys=specific||[
+  p>=.5?'Turn the projected advantage into sustained drives and avoid short fields for '+other+'.':'Stay within one possession early and limit '+other+' possessions.',
+  'Win early downs to avoid predictable passing situations.',
+  'Prevent explosive plays and make '+other+' sustain long drives.'
+ ];
+ return '<h3>'+safeMatchup(team)+'</h3><ol>'+keys.map(k=>'<li>'+safeMatchup(k)+'</li>').join('')+'</ol><p class="note">'+(specific?'Matchup-specific analysis; check latest availability below.':'General model-based keys; opponent-specific scouting not yet verified.')+'</p>';
+}
+function safeMatchup(s){return String(s).replace(/[&<>"]/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[c]));}
+
 /* ---------------- this week's matchups ---------------- */
 function renderMatchups(){
   const now=Date.now();
@@ -1087,7 +1105,7 @@ function renderMatchups(){
     const favoriteP=valid?Math.max(p,1-p):null;
     const date=new Date(g.kickoff).toLocaleString('en-US',{weekday:'short',month:'short',day:'numeric',hour:'numeric',minute:'2-digit',timeZone:'America/New_York'});
     return '<tr><td><strong>'+safe(g.away)+'</strong> at <strong>'+safe(g.home)+'</strong><br><small>'+safe(date)+' ET'+(g.neutral?' · Neutral':'')+'</small></td><td>'+safe(fav||'Unrated')+'</td><td class="num mono">'+(valid?safe(fav)+' -'+Math.abs(m).toFixed(1):'—')+'</td><td class="num mono">'+(valid?pct(favoriteP):'—')+'</td><td class="num mono">'+(valid?safe(g.away)+' '+ml(1-p)+'<br>'+safe(g.home)+' '+ml(p):'—')+'</td></tr>';
-  }).join('')+'</tbody></table></div>':'<p class="note">No upcoming games available in this selection. Check the Schedule tab for broader coverage.</p>';
+  }).join('')+'</tbody></table></div>'+rows.filter(g=>teams.some(t=>t.team===g.home)&&teams.some(t=>t.team===g.away)).map(g=>'<details class="card" style="margin-top:12px"><summary><strong>Keys to Victory: '+safeMatchup(g.away)+' at '+safeMatchup(g.home)+'</strong></summary>'+victoryKeys(g,g.away)+victoryKeys(g,g.home)+availabilityHTML(g.home,g.away)+'</details>').join(''):'<p class="note">No upcoming games available in this selection. Check the Schedule tab for broader coverage.</p>';
 }
 $('#matchupsScope').addEventListener('change',renderMatchups);
 $('#matchupsSort').addEventListener('change',renderMatchups);
