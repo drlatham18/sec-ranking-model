@@ -102,6 +102,44 @@ class CalibrationWiringTests(unittest.TestCase):
         self.assertEqual(out["A"]["n_games"], 1)
 
 
+class CurrentOpponentTests(unittest.TestCase):
+    CUR = dict(CAL, opponent_basis="current")
+
+    def test_loss_to_a_proven_team_costs_less(self):
+        """B beat everyone, so A losing to B is judged against the better B."""
+        ratings = {"A": 10.0, "B": 0.0, "C": 0.0, "D": 0.0}
+        games = [game("B", "C", 40, 0), game("B", "D", 40, 0), game("B", "A", 21, 14)]
+        frozen = inseason.current_ratings(games, ratings, CAL)["A"]["blended"]
+        current = inseason.current_ratings(games, ratings, self.CUR)["A"]["blended"]
+        self.assertGreater(current, frozen)
+
+    def test_old_calibrations_keep_the_preseason_basis(self):
+        ratings = {"A": 5.0, "B": 0.0}
+        games = [game("A", "B", 30, 20)]
+        self.assertEqual(inseason.current_ratings(games, ratings, CAL),
+                         inseason.blend(ratings, inseason.implied_ratings(
+                             games, ratings, CAL["scale_b1"], CAL["scale_hfa"]), CAL["K"]))
+
+    def test_fit_walk_forward_matches_the_live_rating(self):
+        """The validated backtest and the shipped rating must be the same method."""
+        import pandas as pd
+        import fit_inseason
+        rows = [(1, "A", "B", 30, 10), (1, "C", "D", 14, 17),
+                (2, "A", "C", 20, 27), (2, "B", "D", 35, 3), (3, "D", "A", 0, 0)]
+        frame = pd.DataFrame(rows, columns=["week", "home_team", "away_team",
+                                            "home_points", "away_points"])
+        frame["season"], frame["neutral"] = 2030, False
+        frame["hf"] = 1.0
+        frame["margin"] = frame.home_points - frame.away_points
+        pre = {(2030, t): v for t, v in {"A": 8.0, "B": 2.0, "C": 0.0, "D": -3.0}.items()}
+        rh, ra = fit_inseason.walk_forward(frame, pre, 5, 0.9, 3.0)
+        live = inseason.current_ratings(
+            [game(h, a, hp, ap) for _, h, a, hp, ap in rows[:4]],
+            {t: v for (_, t), v in pre.items()}, self.CUR)
+        self.assertAlmostEqual(rh[4], live["D"]["blended"], places=9)
+        self.assertAlmostEqual(ra[4], live["A"]["blended"], places=9)
+
+
 class FbsResultsTests(unittest.TestCase):
     def test_espn_pull_covers_every_fbs_conference_and_keeps_only_finals(self):
         calls = []
