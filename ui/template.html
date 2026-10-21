@@ -755,6 +755,7 @@ const teams = D.teams.map(t=>({...t,national_rank:nationalRanks[t.team]||t.natio
 teams.forEach((t,i)=>t.conf_rank=i+1);
 const secByName = Object.fromEntries(teams.map(t => [t.team,t]));
 const universe = D.all_ratings.map(t => ({...t,...(secByName[t.team]||{}),national_rank:nationalRanks[t.team]||t.national_rank})).sort((a,b)=>currentRating(b)-currentRating(a));
+renderMatchups();
 
 function spark(dist){
   const mx=Math.max(...dist)||1;
@@ -1090,7 +1091,6 @@ function renderMatchups(){
 }
 $('#matchupsScope').addEventListener('change',renderMatchups);
 $('#matchupsSort').addEventListener('change',renderMatchups);
-renderMatchups();
 
 /* ---------------- schedule ---------------- */
 const secSet = new Set(teams.map(t => t.team));
