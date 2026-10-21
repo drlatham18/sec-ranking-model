@@ -289,6 +289,7 @@ footer{border-top:1px solid var(--line); padding:26px 0 60px; color:var(--muted)
     </div>
     <nav role="tablist">
       <button role="tab" aria-selected="true" data-tab="bets">Best Bets</button>
+      <button role="tab" aria-selected="false" data-tab="matchups">This Week’s Matchups</button>
       <button role="tab" aria-selected="false" data-tab="top25">Top 25</button>
       <button role="tab" aria-selected="false" data-tab="weekly">Week to week</button>
       <button role="tab" aria-selected="false" data-tab="team">Team Lens</button>
@@ -338,6 +339,17 @@ footer{border-top:1px solid var(--line); padding:26px 0 60px; color:var(--muted)
     </section>
   </div>
 
+  <div class="panel" id="p-matchups" hidden>
+    <div class="sec-head"><h2>This Week’s Matchups</h2><span class="note" id="matchupsPeriod"></span></div>
+    <p>Current Hedges &amp; Margins forecasts, formatted for comparison with any sportsbook. Lines and moneylines below are model-derived fair values, not bookmaker quotes. No market odds are used.</p>
+    <div class="filters">
+      <label class="f"><span class="eyebrow">Games</span><select id="matchupsScope"><option value="all">Top 25 + SEC</option><option value="top">Model Top 25</option><option value="sec">SEC games</option></select></label>
+      <label class="f"><span class="eyebrow">Sort</span><select id="matchupsSort"><option value="time">Kickoff</option><option value="confidence">Highest confidence</option><option value="close">Closest matchup</option><option value="spread">Largest projected spread</option></select></label>
+    </div>
+    <p class="note" id="matchupsFreshness"></p>
+    <div id="matchupsRows"></div>
+    <p class="note">Top 25 means this model’s current national Top 25, not the AP poll. Only games already covered by the model schedule can be shown; other ranked teams’ games are not silently invented. Fair moneylines are derived from model probabilities, without sportsbook vig. A fair line is not a recommended wager.</p>
+  </div>
   <div class="panel" id="p-top25" hidden>
     <section>
       <div class="sec-head">
@@ -1052,6 +1064,33 @@ function paintGrid(){
   $('#gridHost').innerHTML = h + '</tbody></table>';
 }
 paintGrid();
+
+/* ---------------- this week's matchups ---------------- */
+function renderMatchups(){
+  const now=Date.now();
+  const upcoming=games.filter(g=>!g.played && Number.isFinite(Date.parse(g.kickoff)) && Date.parse(g.kickoff)>now);
+  const week=upcoming.length?Math.min(...upcoming.map(g=>Number(g.week)).filter(Number.isFinite)):null;
+  const current=upcoming.filter(g=>Number(g.week)===week);
+  const ranked=new Set(universe.slice(0,25).map(t=>t.team));
+  const scope=$('#matchupsScope').value;
+  const rows=current.filter(g=>scope==='sec'?teams.some(t=>t.team===g.home||t.team===g.away):scope==='top'?(ranked.has(g.home)||ranked.has(g.away)):(ranked.has(g.home)||ranked.has(g.away)||teams.some(t=>t.team===g.home||t.team===g.away)));
+  const sort=$('#matchupsSort').value;
+  rows.sort((a,b)=>sort==='confidence'?Math.abs(b.p_home-.5)-Math.abs(a.p_home-.5):sort==='close'?Math.abs(a.p_home-.5)-Math.abs(b.p_home-.5):sort==='spread'?Math.abs(b.margin_home||0)-Math.abs(a.margin_home||0):Date.parse(a.kickoff)-Date.parse(b.kickoff));
+  $('#matchupsPeriod').textContent=week==null?'No upcoming games':'Week '+week+' · '+rows.length+' games';
+  $('#matchupsFreshness').textContent='Model data: '+(D.generated_at||D.updated_at||D.as_of||'see site refresh status')+' · Scheduled refresh: every 6 hours; approximately every 30 minutes on SEC game days.';
+  const safe=x=>String(x).replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;','"':'&quot;',"'":'&#39;'}[c]));
+  const ml=p=>{if(!(p>0&&p<1))return '—';const n=p>=.5?-100*p/(1-p):100*(1-p)/p;return (n>0?'+':'')+Math.round(n);};
+  $('#matchupsRows').innerHTML=rows.length?'<div class="tablewrap"><table><thead><tr><th>Matchup / kickoff</th><th>Model favorite</th><th class="num">Projected spread</th><th class="num">Win chance</th><th class="num">Fair moneyline (both teams)</th></tr></thead><tbody>'+rows.map(g=>{
+    const p=Number(g.p_home),m=Number(g.margin_home),valid=Number.isFinite(p)&&p>0&&p<1&&Number.isFinite(m);
+    const fav=valid?(p>=.5?g.home:g.away):null;
+    const favoriteP=valid?Math.max(p,1-p):null;
+    const date=new Date(g.kickoff).toLocaleString('en-US',{weekday:'short',month:'short',day:'numeric',hour:'numeric',minute:'2-digit',timeZone:'America/New_York'});
+    return '<tr><td><strong>'+safe(g.away)+'</strong> at <strong>'+safe(g.home)+'</strong><br><small>'+safe(date)+' ET'+(g.neutral?' · Neutral':'')+'</small></td><td>'+safe(fav||'Unrated')+'</td><td class="num mono">'+(valid?safe(fav)+' -'+Math.abs(m).toFixed(1):'—')+'</td><td class="num mono">'+(valid?pct(favoriteP):'—')+'</td><td class="num mono">'+(valid?safe(g.away)+' '+ml(1-p)+'<br>'+safe(g.home)+' '+ml(p):'—')+'</td></tr>';
+  }).join('')+'</tbody></table></div>':'<p class="note">No upcoming games available in this selection. Check the Schedule tab for broader coverage.</p>';
+}
+$('#matchupsScope').addEventListener('change',renderMatchups);
+$('#matchupsSort').addEventListener('change',renderMatchups);
+renderMatchups();
 
 /* ---------------- schedule ---------------- */
 const secSet = new Set(teams.map(t => t.team));
