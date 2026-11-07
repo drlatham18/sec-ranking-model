@@ -9,7 +9,7 @@ on:
     - cron: '7,37 * * * *'
 
 permissions:
-  contents: read
+  contents: write
   pages: write
   id-token: write
   issues: write
@@ -54,6 +54,8 @@ jobs:
         env:
           CFBD_API_KEY: ${{ secrets.CFBD_API_KEY }}
         run: python src/export_data.py 2026 SEC --refresh
+      - name: Export timestamped matchup and ATS predictions
+        run: python scripts/export_predictions.py
       - name: Check model and results integrity
         run: python -m unittest discover -s tests -v
       - name: Refresh read-only Polymarket comparisons
@@ -62,6 +64,8 @@ jobs:
         env:
           SITE_ORIGIN: https://drlatham18.github.io/sec-ranking-model
         run: npm run build
+      - name: Publish latest prediction JSON alongside site
+        run: cp output/predictions_latest.json dist/predictions_latest.json
       - uses: actions/configure-pages@v5
       - uses: actions/upload-pages-artifact@v3
         with:
@@ -69,6 +73,11 @@ jobs:
       - name: Deploy
         id: deployment
         uses: actions/deploy-pages@v4
+
+      - name: Archive immutable prediction snapshot
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        run: python scripts/archive_predictions.py
 
       # A failed scheduled refresh is otherwise invisible: the previously
       # deployed site stays up and simply goes stale. Raise it where it will be
