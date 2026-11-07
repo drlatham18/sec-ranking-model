@@ -6,6 +6,7 @@ source deployments. Timestamped files are immutable; latest is updated.
 import base64
 import json
 import os
+from datetime import datetime
 from pathlib import Path
 import requests
 
@@ -47,7 +48,7 @@ def main():
     ensure_branch()
     latest = ROOT / "output" / "predictions_latest.json"
     data = latest.read_bytes()
-    stamp = json.loads(data)["generated_at"].replace(":", "-").replace("+00:00", "Z")
+    stamp = datetime.fromisoformat(json.loads(data)["generated_at"]).strftime("%Y-%m-%dT%H-%M-%SZ")
     put(f"predictions/{stamp}.json", data, immutable=True)
     put("predictions/latest.json", data, immutable=False)
     print(f"[archive] predictions/{stamp}.json committed to {BRANCH}")
