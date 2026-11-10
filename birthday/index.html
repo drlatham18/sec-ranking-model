@@ -1,0 +1,27 @@
+<!doctype html>
+<html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><meta name="theme-color" content="#0b0920"><title>11/10 Birthday Bass Drop</title><style>
+*{box-sizing:border-box}body{margin:0;min-height:100vh;display:grid;place-items:center;background:radial-gradient(circle at 50% 15%,#522a91,#120d32 50%,#090817);color:white;font-family:system-ui,Arial,sans-serif;padding:22px}main{max-width:570px;width:100%;text-align:center;padding:38px 24px;border:1px solid #ffffff30;border-radius:28px;background:#ffffff0a;box-shadow:0 25px 80px #0007}small{letter-spacing:.24em;color:#d2b6ff}h1{font-size:clamp(2.3rem,9vw,4.4rem);line-height:1.04;margin:18px 0}h1 span{color:#ff76cf}p{color:#d9d0f0}#count{font-size:clamp(6rem,30vw,11rem);font-weight:900;color:#8fffea;text-shadow:0 0 50px #50d8ff88;min-height:185px;line-height:1.2}button{border:0;border-radius:100px;padding:17px 28px;background:linear-gradient(100deg,#ff73ce,#9c7aff);font-weight:800;color:#120d32;font-size:1.15rem;cursor:pointer;margin:12px}button:disabled{opacity:.55}#line{font-size:1.2rem;min-height:80px;font-weight:650}footer{font-size:.85rem;color:#ad9dc9;margin-top:25px}.pulse{animation:pop .35s}@keyframes pop{from{transform:scale(1.2)}to{transform:scale(1)}} </style></head><body><main><small>11 / 10 • BIRTHDAY COUNTDOWN</small><h1>HAPPY BIRTHDAY,<br><span>SIS!</span></h1><div id="count">11</div><div id="line">Eleven reasons to turn the bass up.</div><button id="play">▶ PLAY THE COUNTDOWN</button><p>Turn up your volume. Headphones recommended.</p><footer>Made with sibling love, questionable lyrics, and excessive bass.</footer></main><script>
+const lines=[
+[11,"It's November ten! Your birthday's here, so here we go again!"],
+[10,"You're a ten out of ten sister!"],
+[9,"Your nine of a husband will never measure up!"],
+[8,"I hope you ate! It's your birthday, don't make the cake wait!"],
+[7,"Seven times I wrote this stupid song!"],
+[6,"Six times I got the lyrics wrong!"],
+[5,"Five! We're keeping this party alive!"],
+[4,"Four! More beats till the birthday arrives!"],
+[3,"Three! You're stuck with me!"],
+[2,"Two! Best siblings we could ever be!"],
+[1,"One! DROP THAT BEAT!"]
+];
+let ctx,active=false,stops=[];const count=document.getElementById('count'),line=document.getElementById('line'),btn=document.getElementById('play');
+function tone(f,t,d,type='sawtooth',vol=.12){const o=ctx.createOscillator(),g=ctx.createGain();o.type=type;o.frequency.setValueAtTime(f,t);g.gain.setValueAtTime(.001,t);g.gain.exponentialRampToValueAtTime(vol,t+.012);g.gain.exponentialRampToValueAtTime(.001,t+d);o.connect(g).connect(ctx.destination);o.start(t);o.stop(t+d+.03)}
+function kick(t,big=false){const o=ctx.createOscillator(),g=ctx.createGain();o.type='sine';o.frequency.setValueAtTime(big?160:125,t);o.frequency.exponentialRampToValueAtTime(42,t+.22);g.gain.setValueAtTime(big?.85:.48,t);g.gain.exponentialRampToValueAtTime(.001,t+.35);o.connect(g).connect(ctx.destination);o.start(t);o.stop(t+.37)}
+function hat(t){const len=.05,buf=ctx.createBuffer(1,Math.floor(ctx.sampleRate*len),ctx.sampleRate),a=buf.getChannelData(0);for(let i=0;i<a.length;i++)a[i]=(Math.random()*2-1)*.22;const s=ctx.createBufferSource(),g=ctx.createGain(),f=ctx.createBiquadFilter();f.type='highpass';f.frequency.value=6500;s.buffer=buf;g.gain.setValueAtTime(.12,t);g.gain.exponentialRampToValueAtTime(.001,t+len);s.connect(f).connect(g).connect(ctx.destination);s.start(t)}
+function bass(t,f=55){tone(f,t,.36,'sawtooth',.18);tone(f/2,t,.35,'sine',.35)}
+function say(s){return new Promise(resolve=>{if(!('speechSynthesis'in window)){resolve();return}const u=new SpeechSynthesisUtterance(s);u.rate=1.18;u.pitch=1.15;u.volume=1;u.onend=resolve;u.onerror=resolve;speechSynthesis.speak(u)})}
+const wait=ms=>new Promise(r=>{const id=setTimeout(r,ms);stops.push(id)});
+async function run(){if(active)return;active=true;btn.disabled=true;btn.textContent='♪ PARTY IN PROGRESS';ctx=new (window.AudioContext||window.webkitAudioContext)();await ctx.resume();speechSynthesis.cancel();for(let i=0;i<lines.length&&active;i++){const [n,s]=lines[i];count.textContent=n;count.classList.remove('pulse');void count.offsetWidth;count.classList.add('pulse');line.textContent=s;const t=ctx.currentTime+.04;for(let j=0;j<4;j++){kick(t+j*.25);hat(t+j*.25+.125);bass(t+j*.25,[55,65.4,73.4,49][i%4])}await Promise.all([say(n+'! '+s),wait(1300)])}
+if(active){count.textContent='🎉';line.textContent='HAPPY BIRTHDAY!';const start=ctx.currentTime+.08;for(let i=0;i<32;i++){const t=start+i*.25;kick(t,i%4===0);hat(t+.125);bass(t,[55,55,65.4,49][Math.floor(i/4)%4]);if(i%2===0)tone([440,494,523,587,659,587,523,440][Math.floor(i/2)%8],t,.21,'square',.07)}await say('HAPPY BIRTHDAY!');await wait(4500)}active=false;btn.disabled=false;btn.textContent='↻ PLAY AGAIN'}
+btn.addEventListener('click',run);
+</script></body></html>
