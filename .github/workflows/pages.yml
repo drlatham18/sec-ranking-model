@@ -64,6 +64,8 @@ jobs:
         env:
           SITE_ORIGIN: https://drlatham18.github.io/sec-ranking-model
         run: npm run build
+      - name: Include birthday countdown page
+        run: mkdir -p dist/birthday && cp birthday/index.html dist/birthday/index.html
       - name: Publish latest prediction JSON alongside site
         run: cp output/predictions_latest.json dist/predictions_latest.json
       - uses: actions/configure-pages@v5
