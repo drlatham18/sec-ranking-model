@@ -215,24 +215,31 @@ error in either.
 ## In-season strength
 
 The preseason model cannot see the season being played. `src/inseason.py` folds
-completed games back into each rating: every result against a rated opponent
-yields an opponent- and venue-adjusted implied rating, and preseason is shrunk
-toward the mean of those by `weight = n / (n + K)`.
+completed games back into each rating: every result yields an opponent- and
+venue-adjusted implied rating, and preseason is shrunk toward the mean of those
+by `weight = n / (n + K)`.
 
-`K` is not hand-set. It is chosen by leave-one-season-out log loss on the
-development seasons, then the holdout seasons are scored once. On 1,979
-untouched holdout games (2023-2025, week 3 on):
+Each result is judged against the opponent's **current** rating (its own blend
+to date), not its preseason forecast. Losing badly to a team that has proven far
+better than August's guess is not scored as losing to the August team, and
+beating a team that has collapsed earns less.
 
-| | preseason only | + in-season blend |
-|---|---|---|
-| Straight-up accuracy | 0.658 | **0.721** |
-| Brier | 0.209 | **0.182** |
-| Log loss | 0.601 | **0.538** |
-| Margin MAE | 13.87 | **12.53** |
+`K` is not hand-set. Development seasons are scored by leave-one-season-out log
+loss, and the **smallest K within 0.001 of the best** wins: log-loss gaps that
+small are noise, so ties go to trusting results sooner. That picks K = 3, so
+results carry 50% of the rating after 3 games, 57% after 4 and 73% after 8.
+The holdout seasons are then scored once. On 1,979 untouched holdout games
+(2023-2025, week 3 on):
 
-The gain holds in every week window and grows late in the year (week 13+:
-0.631 -> 0.727). A simultaneous ridge/SRS opponent solve was also tested and did
-*not* beat this simpler blend on development log loss, so it was not adopted.
+| | preseason only | previous blend (K=5, preseason opponents) | **current blend** |
+|---|---|---|---|
+| Straight-up accuracy | 0.658 | 0.721 | **0.724** |
+| Brier | 0.209 | 0.182 | **0.181** |
+| Log loss | 0.601 | 0.538 | **0.536** |
+| Margin MAE | 13.87 | 12.53 | **12.42** |
+
+A simultaneous ridge/SRS opponent solve was also tested and did *not* beat a
+simple blend on development log loss, so it was not adopted.
 
 ### How accurate can this get?
 
@@ -247,11 +254,11 @@ the lowest confidence tier whose **95% lower bound** clears the target:
 
 | min confidence | games | coverage | accuracy | 95% CI |
 |---|---|---|---|---|
-| >=0.50 (every game) | 1979 | 100% | 0.721 | [0.700, 0.740] |
-| >=0.65 | 1222 | 62% | 0.813 | [0.790, 0.835] |
-| >=0.75 | 752 | 38% | 0.874 | [0.848, 0.897] |
-| **>=0.80** | **563** | **28%** | **0.895** | **[0.867, 0.919]** |
-| >=0.90 | 229 | 12% | 0.965 | [0.932, 0.985] |
+| >=0.50 (every game) | 1979 | 100% | 0.724 | [0.704, 0.744] |
+| >=0.65 | 1216 | 61% | 0.812 | [0.789, 0.834] |
+| >=0.75 | 754 | 38% | 0.875 | [0.850, 0.898] |
+| **>=0.80** | **551** | **28%** | **0.906** | **[0.878, 0.929]** |
+| >=0.90 | 230 | 12% | 0.961 | [0.927, 0.982] |
 
 The shipped `playable_threshold` is the first tier meeting the target on its
 lower bound. Every game in `app_data.json` carries `confidence_current` and a
@@ -261,6 +268,22 @@ covers about a quarter of the slate.
 Sample size is the thing to watch. Ten games cannot establish reliability -- a
 9/11 result has a 95% interval of roughly [0.48, 0.98]. The numbers above rest
 on 1,979 games precisely so they mean something.
+
+## Live accuracy, week by week
+
+`src/accuracy.py` scores every completed week from the first validated week
+(week 3) on. Each week is predicted with ratings rebuilt from **earlier weeks
+only**, exactly what the model knew at kickoff, so the result is honest even
+though the page later overwrites game probabilities with newer ratings. The
+in-season blend and preseason-only ratings are scored on the same FBS-vs-FBS
+games (accuracy, Brier, log loss, margin error, confidence tiers, conference
+subset, biggest misses).
+
+Missing data is flagged rather than dropped silently: scores not cross-checked
+by a second feed, score conflicts, unfinished games, games involving unrated
+(FCS) teams, and rated teams with no game in the feed. The export writes
+`output/weekly_accuracy.json`, embeds it as `weekly_accuracy`, and the Model Card
+shows it. It reuses the export's single schedule fetch: no extra CFBD request.
 
 ## Results and week-to-week comparisons
 

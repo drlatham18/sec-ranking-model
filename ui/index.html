@@ -510,6 +510,17 @@ footer{border-top:1px solid var(--line); padding:26px 0 60px; color:var(--muted)
 
   <!-- ================= MODEL CARD ================= -->
   <div class="panel" id="p-model" hidden>
+    <section id="liveAccSection" hidden>
+      <div class="sec-head"><h2>This season, week by week</h2>
+        <span class="note">Each week predicted with only the results known before kickoff</span></div>
+      <div class="tablewrap"><table id="liveAcc"><thead><tr>
+        <th class="num">Week</th><th class="num">Games</th><th class="num">Model right</th>
+        <th class="num">Preseason only</th><th class="num">SEC games</th>
+        <th class="num">Margin miss</th><th>Biggest upset</th>
+      </tr></thead><tbody></tbody></table></div>
+      <div id="liveAccFlags"></div>
+    </section>
+
     <section>
       <div class="sec-head"><h2>How the model was built</h2></div>
       <div class="prose">
@@ -1130,6 +1141,26 @@ $('#calKV').innerHTML = [
   ['FBS win rate vs FCS', pct(D.fcs_win_rate.p) + ' (' + D.fcs_win_rate.n_games.toLocaleString() + ' games)'],
   ['Simulated seasons', D.n_sims.toLocaleString()],
 ].map(([k,v]) => `<dt>${k}</dt><dd>${v}</dd>`).join('');
+
+const WA = D.weekly_accuracy || [];
+if (WA.length) {
+  const h = v => String(v).replace(/[&<>"']/g, c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
+  const frac = m => m ? `${m.correct}/${m.n} <span style="color:var(--muted)">(${pct(m.accuracy)})</span>` : '&mdash;';
+  $('#liveAccSection').hidden = false;
+  $('#liveAcc tbody').innerHTML = WA.map(w => {
+    const top = w.misses[0];
+    const upset = top ? `${h(top.away)} ${top.away_points}&ndash;${top.home_points} at ${h(top.home)} <span style="color:var(--muted)">(${h(top.favorite)} ${pct(top.confidence)})</span>` : '&mdash;';
+    return `<tr><td class="num mono">${w.week}${w.complete ? '' : '*'}</td>
+      <td class="num mono">${w.model ? w.model.n : 0}</td>
+      <td class="num mono">${frac(w.model)}</td><td class="num mono">${frac(w.preseason_only)}</td>
+      <td class="num mono">${frac(w.conference && w.conference.model)}</td>
+      <td class="num mono">${w.model ? w.model.margin_mae.toFixed(1) + ' pts' : '&mdash;'}</td>
+      <td>${upset}</td></tr>`;
+  }).join('');
+  const flagged = WA.filter(w => w.flags.length);
+  $('#liveAccFlags').innerHTML = (WA.some(w => !w.complete) ? '<p class="note" style="color:var(--muted);font-size:.84rem">* Week still in progress.</p>' : '') +
+    flagged.map(w => `<p class="note" style="font-size:.84rem;margin:6px 0"><strong style="color:var(--bad)">&#9873; Week ${w.week}:</strong> ${w.flags.map(h).join(' ')}</p>`).join('');
+}
 
 const requestedTab=new URL(location.href).searchParams.get('tab');
 activateTab(requestedTab||'bets',false);
