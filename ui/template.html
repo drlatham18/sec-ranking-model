@@ -291,6 +291,7 @@ footer{border-top:1px solid var(--line); padding:26px 0 60px; color:var(--muted)
       <button role="tab" aria-selected="true" data-tab="bets">Best Bets</button>
       <button role="tab" aria-selected="false" data-tab="matchups">This Week’s Matchups</button>
       <button role="tab" aria-selected="false" data-tab="top25">Top 25</button>
+      <button id="tab-power" role="tab" aria-selected="false" aria-controls="p-power" data-tab="power">Power Ratings</button>
       <button role="tab" aria-selected="false" data-tab="weekly">Week to week</button>
       <button role="tab" aria-selected="false" data-tab="team">Team Lens</button>
       <button role="tab" aria-selected="false" data-tab="lab">Matchup Lab</button>
@@ -364,9 +365,15 @@ footer{border-top:1px solid var(--line); padding:26px 0 60px; color:var(--muted)
           </select></label>
         </div>
       </div>
-      <p class="note" id="strictMethod">Current-season results only. Schedule difficulty is built into
-        both scoring production and strength of record. Weights are learned from historical games;
-        there are no AP votes, preseason ratings, recruiting, or conference bonuses.</p>
+      <h3>How teams are ranked</h3>
+      <p class="prose" id="strictMethod"><strong>Top 25 ranks what teams have earned this season.</strong>
+        The model combines two things using weights learned from historical games:
+        <strong>production</strong> (scoring margins adjusted for opponent and home field)
+        and <strong>strength of record</strong> (how unlikely it would be for a typical model top-25 team
+        to win at least as many games against the same opponents at the same sites).
+        Schedule difficulty already feeds those measures, so the SOS column is not a third scoring bonus.
+        No poll votes, preseason ratings, recruiting data, or conference bonuses enter this ranking.</p>
+      <p class="note">For who the model would favor on a neutral field, see <a href="?tab=power" id="t25PowerLink">Power Ratings</a>.</p>
       <p class="note" id="strictDetails"></p>
       <div class="tablewrap">
         <table id="t25Table">
@@ -386,6 +393,31 @@ footer{border-top:1px solid var(--line); padding:26px 0 60px; color:var(--muted)
         <span><span class="sw" style="background:var(--accent)"></span>risen</span>
         <span><span class="sw" style="background:var(--muted)"></span>fallen</span>
         <span>SOS covers completed games only. A difficult schedule earns credit through opponent adjustment, not an extra bonus for losing.</span>
+      </div>
+    </section>
+  </div>
+
+  <div class="panel" id="p-power" role="tabpanel" aria-labelledby="tab-power" hidden>
+    <section>
+      <div class="sec-head">
+        <h2>Power Ratings · Neutral-field strength</h2>
+        <span class="note" id="powerNote"></span>
+      </div>
+      <p class="prose"><strong>Power Ratings predict who is stronger, not who has earned a higher rank.</strong>
+        The matchup model starts with its fitted preseason forecast and updates it using completed games
+        against rated opponents, correcting for opponent strength and venue. More rated games give this
+        season’s results more influence. These are this model’s estimates, not published SP+ ratings.</p>
+      <p class="note">Zero is the average rated FBS team. Subtract two ratings to estimate the neutral-field
+        point margin; a +14 team would be favored by about 10 points over a +4 team. This is a baseline
+        forecast, not a game result, and it does not adjust for individual players’ availability.
+        See the <a href="?tab=top25" id="powerTop25Link">results-only Top 25</a> for résumé rankings.</p>
+      <div class="tablewrap" id="powerResults" hidden>
+        <table id="powerTable" aria-label="Predictive FBS power ratings">
+          <thead><tr><th scope="col">Rank</th><th scope="col">Team</th><th scope="col">Conf</th>
+            <th scope="col" class="num">Power (pts)</th><th scope="col" class="num" title="Completed games against opponents with ratings used in the current estimate">Games used</th>
+          </tr></thead>
+          <tbody></tbody>
+        </table>
       </div>
     </section>
   </div>
@@ -692,7 +724,7 @@ const checked = new Date(D.data_source?.checked_at || D.generated_at);
 const stale = games.some(g=>!g.played) && Date.now()-checked.getTime() > 7*60*60*1000;
 $('#freshness').textContent = `Results checked ${checked.toLocaleString()} · ${(D.data_source?.provider || 'CFBD').toUpperCase()} · ${D.completed_games ?? games.filter(g=>g.played).length} finals. Refresh target: every 6 hours; hourly Wednesday–Friday in season; every 30 minutes on SEC game days. ${stale?'Results may be stale. ':''}All forward-looking views use ${D.inseason?'current strength from completed results':'preseason strength (no results yet)'}. Availability reports do not yet change the numerical forecast.`;
 
-$('#modelStatus').textContent = `${stale?'Refresh overdue. ':''}${D.inseason?'Ratings incorporate completed games through week '+D.inseason.through_week:'Preseason ratings: no completed results incorporated'}. Player availability is shown separately; numerical odds do not include a player-specific adjustment.`;
+$('#modelStatus').textContent = `${stale?'Refresh overdue. ':''}${D.inseason?'Predictive ratings use completed national results. Latest completed SEC-schedule week: '+D.inseason.through_week:'Preseason ratings: no completed results incorporated'}. Player availability is shown separately; numerical odds do not include a player-specific adjustment.`;
 const escapeText = s => String(s).replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
 function availabilityHTML(a,b){
   const feed=D.availability;
@@ -722,6 +754,13 @@ function activateTab(name, updateUrl=true){
   }
 }
 tabs.forEach(b => b.addEventListener('click', () => activateTab(b.dataset.tab)));
+for(const [selector,tab] of [['#t25PowerLink','power'],['#powerTop25Link','top25']]){
+  $(selector).addEventListener('click',e=>{
+    if(e.button!==0 || e.metaKey || e.ctrlKey || e.shiftKey || e.altKey) return;
+    e.preventDefault(); activateTab(tab);
+    document.getElementById('p-'+tab).querySelector('h2').scrollIntoView({block:'start'});
+  });
+}
 $('#sharePage').addEventListener('click',async()=>{
   const u=new URL(location.href), active=tabs.find(b=>b.getAttribute('aria-selected')==='true')?.dataset.tab;
   u.search='';
@@ -836,9 +875,13 @@ $('#weeklySelect').addEventListener('change',()=>{
 renderWeekly();
 
 /* ---------------- model top 25 ---------------- */
-const NAT = D.national_ranking || D.top25 || [];
+const strictAvailable = D.top25_basis === 'strict_results';
+const NAT = strictAvailable ? (D.national_ranking || D.top25 || []) : [];
 if(!NAT.length){
-  $('#t25Note').textContent='No completed games: no earned ranking yet.';
+  $('#t25Note').textContent=strictAvailable
+    ? 'No completed games: no earned ranking yet.'
+    : 'This snapshot does not contain results-only rankings.';
+  $('#t25Table').closest('.tablewrap').hidden=true;
 }else{
   const method=D.ranking_method;
   if(method){
@@ -871,6 +914,29 @@ if(!NAT.length){
   $('#t25Depth').addEventListener('change', renderT25);
   $('#t25Move').addEventListener('change', renderT25);
   renderT25();
+}
+
+/* ---------------- predictive power ratings ---------------- */
+const powerCoeff = ACTIVE?.rating_diff_coef;
+const powerTeams = D.all_ratings.map(t => ({...t, rating:currentRating(t)}))
+  .filter(t => Number.isFinite(t.rating))
+  .sort((a,b) => b.rating-a.rating || a.team.localeCompare(b.team));
+if(powerTeams.length && Number.isFinite(powerCoeff) && powerCoeff > 0){
+  const ratedMean = powerTeams.reduce((sum,t) => sum+t.rating,0)/powerTeams.length;
+  const snapshot = new Date(D.data_source?.checked_at || D.generated_at);
+  const basis = D.inseason ? 'current strength' : 'preseason only';
+  const asOf = D.inseason && Number.isFinite(snapshot.getTime())
+    ? ' · results checked '+snapshot.toLocaleString('en-US',{timeZone:'America/New_York'})+' ET' : '';
+  $('#powerNote').textContent = `${powerTeams.length} rated FBS teams · ${basis}${asOf}`;
+  $('#powerTable tbody').innerHTML = powerTeams.map((t,i) => {
+    const points = Math.round(10*powerCoeff*(t.rating-ratedMean))/10;
+    const n = D.inseason ? t.games_rated : 0;
+    return `<tr><td>${i+1}</td><th scope="row">${escapeText(t.team)}</th><td class="note">${escapeText(t.conference || '—')}</td>`
+      + `<td class="num">${sign(points)}</td><td class="num">${Number.isInteger(n) && n>=0 ? n : '—'}</td></tr>`;
+  }).join('');
+  $('#powerResults').hidden = false;
+}else{
+  $('#powerNote').textContent = 'Calibrated predictive ratings are unavailable in this snapshot.';
 }
 
 /* ---------------- matchup lab ---------------- */
