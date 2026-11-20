@@ -64,6 +64,11 @@ class LiveForecastTests(unittest.TestCase):
             with patch.object(export_data,'OUT',out), patch.object(schedule_data,'fetch_consensus',return_value=(frame,{'checked_at':old['generated_at']})), patch.object(availability,'fetch_reports',return_value={'status':'unavailable','reports':[]}), patch.object(export_data,'N_SIMS',50):
                 result=export_data.build()
         self.assertIsNotNone(result['inseason'])
+        self.assertEqual(result['top25_basis'], 'strict_results')
+        self.assertEqual(result['top25'], result['national_ranking'][:25])
+        self.assertTrue(all(r['from_results'] == 1.0 for r in result['national_ranking']))
+        self.assertTrue(all('sos_rank' in r and 'sor_rank' in r and 'production' in r
+                            for r in result['national_ranking']))
         for game in result['games']:
             self.assertEqual(game['p_home'],game['p_home_current'])
             self.assertIn('p_home_preseason',game)

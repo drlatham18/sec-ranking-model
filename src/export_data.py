@@ -18,6 +18,7 @@ import schedule_data
 import weekly
 import inseason
 import national
+import strict_rank
 import availability
 
 ROOT = pathlib.Path(__file__).resolve().parents[1]
@@ -189,26 +190,23 @@ def build(season=2026, conference="SEC", source="auto", refresh=False):
     else:
         current_grid = None
 
-    # --- the model's own national ranking --------------------------------
-    # A poll is votes; this is the rating, ordered. Movement is measured
-    # against the model's own earlier state, not anyone else's ballot.
-    rank_basis = cmap if cmap else rmap
-    all_results = [{"home": r.home_team, "away": r.away_team,
+    # Results-only Top 25; the separately validated forecasting engine stays
+    # on its own point/probability scale.
+    all_results = [{"id": str(r.id), "week": int(r.week),
+                    "home": r.home_team, "away": r.away_team,
                     "home_points": r.home_points, "away_points": r.away_points,
                     "neutral": bool(r.neutral)}
                    for _, r in full[full.completed].iterrows()]
-    record_table = national.records(all_results, rmap.keys())
-    prior_ratings = None
-    if strength is not None and through_week and through_week > 1:
-        earlier = full[full.completed & (full.week < through_week)]
-        prior_rows = [{"home": r.home_team, "away": r.away_team,
-                       "home_points": r.home_points, "away_points": r.away_points,
-                       "neutral": bool(r.neutral)} for _, r in earlier.iterrows()]
-        prior_ratings = {t: v["blended"]
-                         for t, v in inseason.current_ratings(prior_rows, rmap, cal_in).items()}
-    detail = strength or {}
-    national_table = national.table(rank_basis, rmap, prior_ratings, record_table,
-                                    detail)
+    ranking_week = int(full.loc[full.completed, "week"].max()) if all_results else 0
+    strict_cal = strict_rank.load_calibration()
+    national_table, ranking_meta = strict_rank.rank(all_results, rmap.keys(), strict_cal)
+    prior_national, _ = strict_rank.rank(
+        [r for r in all_results if r["week"] < ranking_week], rmap.keys(), strict_cal)
+    prior_ranks = {r["team"]: r["rank"] for r in prior_national}
+    for row in national_table:
+        old_rank = prior_ranks.get(row["team"])
+        row["previous_rank"] = old_rank
+        row["change_since_last_week"] = old_rank-row["rank"] if old_rank else None
     top25 = national_table[:25]
 
     oos = pd.read_csv(OUT / "oos_predictions.csv")
@@ -266,8 +264,9 @@ def build(season=2026, conference="SEC", source="auto", refresh=False):
         "games": games,
         "top25": top25,
         "national_ranking": national_table,
-        "top25_basis": "current_rating" if cmap else "preseason_rating",
-        "ranking_through_week": through_week,
+        "top25_basis": "strict_results",
+        "ranking_method": {**strict_cal, **ranking_meta},
+        "ranking_through_week": ranking_week,
         "neutral_grid": current_grid or grid,
         "preseason_neutral_grid": grid,
         "current_grid": current_grid,

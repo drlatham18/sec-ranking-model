@@ -192,25 +192,54 @@ Existing datasets must be rebuilt to create this provenance before refitting;
 fitting will fail clearly rather than guess from the number of played games.
 Committed model outputs are snapshots and are not refreshed by installing code.
 
-## Top 25 vs the AP poll
+## Strict earned Top 25
 
-`src/polls.py` pulls the AP and Coaches polls from ESPN's keyless rankings
-endpoint, so this costs nothing against the CFBD key quota, and lines them up
-against our own top 25 by current rating.
+The national Top 25 uses **current-season results only**. AP votes, preseason
+ratings, recruiting and conference labels are not inputs. Matchup probabilities
+remain on the separately validated predictive engine; earned rank is not a
+betting probability.
 
-One timing trap is made explicit rather than glossed over: **the poll labelled
-"Week N" is voted before week N is played**, so it reflects results through
-week N-1. Comparing it against a rating that already includes week N would
-flatter the rating. The UI therefore offers two views:
+- **Production:** a simultaneous ridge solve adjusts scoring margins for the
+  opponents faced and home field. Margins are capped at 35 before adjustment,
+  so running up a 70-point win cannot add more credit than a 35-point win.
+- **Strength of record:** a regularized Bradley-Terry model estimates opponent
+  strength from wins/losses. Exact Poisson-binomial probability measures how
+  likely an average model top-25 team would be to match or exceed the team's
+  wins on that played schedule. Lower probability means a stronger record.
+- **Strength of schedule:** mean opponent production adjusted for game site,
+  over completed games only. Its rank is displayed; schedule difficulty already
+  enters production and SOR and is not added a second time as a bonus.
+- **Composite:** nonnegative regression learns the production and SOR weights
+  against subsequent game margins. There is no hand-weighted 50/30/20 formula.
+  No games means no earned rank; initial-season ranks are provisional.
 
-- **Like for like** - our ranking recomputed using only the games the voters
-  had seen, so neither side has an information advantage.
-- **Our latest vs AP** - our current ranking, which knows more than the poll did.
+The deterministic fit compares caps of 21/28/35 and shrinkage of 1/3 using
+2017-2022 walk-forward evaluation, with 2014-2016 supplying initial training.
+Every feature snapshot excludes the week it predicts. Hyperparameters and
+coefficients are frozen before the 2023-2025 holdout (1,659 games, week 5 onward).
+The holdout accuracy is 71.49% and margin RMSE is 15.92 points; production alone
+is 71.25% and 15.92. This does **not** establish a meaningful predictive gain.
+The change implements a transparent earned-results ranking, not a claim of
+better betting performance. See `output/strict_ranking_calibration.json` for
+all candidates, coefficients and results.
 
-A rating and a poll are not the same measurement. `sp_overall` estimates points
-per game against an average opponent; a poll is voters weighing record,
-opponent quality and reputation. Their disagreements are the output, not an
-error in either.
+Production means final-score production, **not** EPA, success rate, possession
+or garbage-time-filtered efficiency. Raw points scored/allowed are displayed
+for context but are not extra inputs. Unrated opponents share a fitted pool;
+individual FCS strength is not resolved. The SOR normal transform uses finite
+numerical bounds (probabilities clipped at 1e-12; lower score floor -4).
+Ties receive half credit in the record-strength fit and conservative integer
+win thresholds in SOR. Weekly movement compares the same method at each cutoff.
+
+```bash
+OPENBLAS_NUM_THREADS=1 python scripts/fit_strict_rank.py
+python src/export_data.py 2026 SEC --refresh
+python src/build_ui.py
+```
+
+The ordinary refresh loads frozen coefficients and rebuilds ranks from fresh
+scores; it never tunes weights on live results. All Top 25 lists, team badges,
+and ranked-matchup filters use the same national list.
 
 ## In-season strength
 

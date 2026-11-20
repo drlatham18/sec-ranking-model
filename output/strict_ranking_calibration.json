@@ -1,0 +1,108 @@
+{
+  "version": "strict-results-v1",
+  "margin_cap": 35,
+  "shrinkage": 1.0,
+  "coefficients": {
+    "production": 0.9651195784792562,
+    "sor_score": 0.4102794715911404,
+    "home_field": 2.3239512386715333
+  },
+  "trained_through": 2022,
+  "development_seasons": [
+    2017,
+    2018,
+    2019,
+    2020,
+    2021,
+    2022
+  ],
+  "holdout_seasons": [
+    2023,
+    2024,
+    2025
+  ],
+  "holdout": {
+    "composite": {
+      "games": 1659,
+      "rmse": 15.920681473797583,
+      "mae": 12.58873845231818,
+      "accuracy": 0.7148884870403858
+    },
+    "production_only": {
+      "games": 1659,
+      "rmse": 15.915574683244486,
+      "mae": 12.583578157009214,
+      "accuracy": 0.7124773960216998
+    }
+  },
+  "candidates": [
+    {
+      "margin_cap": 21,
+      "shrinkage": 1.0,
+      "development": {
+        "games": 3067,
+        "rmse": 16.68406956525322,
+        "mae": 13.275668681177972,
+        "accuracy": 0.7091620476035213
+      }
+    },
+    {
+      "margin_cap": 21,
+      "shrinkage": 3.0,
+      "development": {
+        "games": 3067,
+        "rmse": 16.69496720935044,
+        "mae": 13.294533778641929,
+        "accuracy": 0.7107923051842191
+      }
+    },
+    {
+      "margin_cap": 28,
+      "shrinkage": 1.0,
+      "development": {
+        "games": 3067,
+        "rmse": 16.563204829684484,
+        "mae": 13.171224555542478,
+        "accuracy": 0.7134007173133355
+      }
+    },
+    {
+      "margin_cap": 28,
+      "shrinkage": 3.0,
+      "development": {
+        "games": 3067,
+        "rmse": 16.587627897163923,
+        "mae": 13.202287582008887,
+        "accuracy": 0.7127486142810564
+      }
+    },
+    {
+      "margin_cap": 35,
+      "shrinkage": 1.0,
+      "development": {
+        "games": 3067,
+        "rmse": 16.476353363362307,
+        "mae": 13.085813961815312,
+        "accuracy": 0.7120965112487773
+      }
+    },
+    {
+      "margin_cap": 35,
+      "shrinkage": 3.0,
+      "development": {
+        "games": 3067,
+        "rmse": 16.510908011041224,
+        "mae": 13.128438449712467,
+        "accuracy": 0.7114444082164982
+      }
+    }
+  ],
+  "minimum_validation_week": 5,
+  "method": "Results-only scoring production plus strength of record; weights learned from future game margins.",
+  "limitations": [
+    "Scoring production, not play-by-play efficiency or garbage-time-adjusted EPA.",
+    "Unrated opponents share a fitted pool; individual FCS strength is not resolved.",
+    "Early-season rankings have limited evidence; validation covers week 5 onward.",
+    "A resume ranking is not a calibrated betting probability."
+  ]
+}
